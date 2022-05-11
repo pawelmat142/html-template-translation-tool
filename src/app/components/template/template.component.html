@@ -1,0 +1,9 @@
+<div 
+    *ngIf="content"
+    class="content"
+    [innerHTML]="content"
+    (mousemove)="onMousemove($event)"
+>
+</div>
+
+<p *ngIf="!content" class="no-content">Load HTML File!</p>

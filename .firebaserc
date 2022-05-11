@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "html-translator-d72f3"
+  },
+  "targets": {
+    "html-translator-d72f3": {
+      "hosting": {
+        "html-translator": [
+          "html-translator-d72f3"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+<h1>{{d.header}}</h1>
+
+
+<ng-container *ngIf="d.okButtons.length">
+    <div *ngFor="let button of d.okButtons;index as index">
+        <button (click)="onOkButton(index); close()">{{button}}</button>
+    </div>
+</ng-container>
+
+<button (click)="close()" class="close">CLOSE</button>

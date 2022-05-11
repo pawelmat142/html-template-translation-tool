@@ -1,0 +1,92 @@
+:host {
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: 2em 1em;
+    background-color: #7993ad;
+    display: grid;
+    grid-template-rows: 1fr 8fr 1fr;
+    column-gap: 1.5em;
+    row-gap: 2em;
+    height: 100vh;
+}
+
+/* TOP */
+.top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 1.5em;
+    row-gap: .5em;
+}
+
+.top .btn {
+    height: 60px;
+    line-height: 1.2em;
+}
+
+.btn {
+    height: 40px;
+    width: 100%;
+    padding: 0.3em 1em;
+    background-color: #2b2f33;
+    border: 2px solid #2b2f33;
+    border-radius: 0.2em;
+    color: #fff;
+    letter-spacing: .1em;
+    transition: .15s ease;
+}
+
+.btn.notactive {
+    cursor: default;
+}
+    
+.btn:not(.notactive):hover {
+    color: #2b2f33;
+    background-color: transparent;
+}
+
+.view {
+    background-color: #fff;
+    border: 1px solid #2b2f33;
+    height: 40px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* MIDDLE */
+.middle {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    column-gap: 1.5em;
+    row-gap: 1em;
+}
+
+.middle textarea {
+    padding: .5em 1em;
+}
+
+.middle .next-to-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1em
+}
+
+
+/* BOTTOM */
+.bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1.5em;
+    row-gap: 1em;
+    align-items: flex-end;
+}
+
+
+
+
+
+

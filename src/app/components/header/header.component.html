@@ -1,0 +1,31 @@
+<div>
+    <button (click)="logout()">Logout</button>
+</div>
+
+<div class="file-input-container">
+    <input 
+        type="file" 
+        class="file-input"
+        (change)="onFileSelected($event)" 
+        #fileUpload
+    >
+</div>
+
+
+<div class="file-upload">
+
+    <p class="filename">
+        {{fileName || "No file uploaded yet..."}}
+    </p>
+
+    <button mat-mini-fab color="primary" class="upload-btn"
+      (click)="fileUpload.click()">
+        <mat-icon>attach_file</mat-icon>
+    </button>
+</div>
+
+
+<div>
+    <button>action</button>
+</div>
+

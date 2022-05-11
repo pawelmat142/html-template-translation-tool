@@ -1,0 +1,77 @@
+:host {
+    z-index: 100;
+    min-width: 500px;
+    min-height: 500px;
+    position: absolute;
+    top: 10vh;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+
+    padding: 2em 3em;
+    background-color: #2b2f33;
+    border-radius: 1em;
+    border: 2px solid #2b2f33;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1em;
+
+    font-size: 18px;
+}
+
+:host div {
+    width: 100%;
+}
+
+h1 {
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+button {
+    width: 100%;
+    background-color: #447187;
+    border: 2px solid #447187;
+    border-radius: .5em;
+    color: #fff;
+    line-height: 3em;
+    transition: .15s ease;
+}
+
+button.close {
+    background-color: #0073aa;
+    border: 2px solid #0073aa;
+}
+
+button.close:hover,
+button:hover {
+    background-color: transparent;
+}
+
+:host.open {
+    animation: open-animation .2s ease-in-out forwards;
+}
+
+:host.open.close {
+    animation: close-animation .2s ease-in-out forwards;
+}
+
+@keyframes open-animation {
+    from {
+        transform: translateX(-50%) scale(0);
+    } to {
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+@keyframes close-animation {
+    from {
+        transform: translateX(-50%) scale(1);
+    } to {
+        transform: translateX(-50%) scale(0);
+    }
+}

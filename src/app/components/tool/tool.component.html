@@ -1,0 +1,57 @@
+<div class="top">
+    <button class="btn notactive">Origin language</button>
+    <button class="btn" (click)="onChooseLanguage()">Translate to language</button>
+    <button 
+        class="btn" 
+        (click)="addIndentifier()" 
+        [disabled]="identifier || !stringToTranslate"
+    >add element identifier</button>
+    
+    <p class="view">{{originLanguage ? (originLanguage | tittlecase): 'load html!' }}</p>
+    <p class="view">{{language ? (language | tittlecase) : 'no data' }}</p>
+    <p class="view">{{identifier ? identifier : 'no identifier' }}</p>
+</div>
+
+<div class="middle">
+
+    <textarea disabled >{{stringToTranslate}}</textarea>
+    
+    <div class="next-to-area">
+        <button 
+            class="btn" 
+            (click)="clearStringToTranslate()"
+            [disabled]="!stringToTranslate"
+        >clear</button>
+        <button class="btn">cos</button>
+        <button class="btn"></button>
+    </div>
+    
+    
+    <textarea 
+        [disabled]="!identifier || !stringToTranslate || !language" 
+        [(ngModel)]="translationArea">
+    </textarea>
+    
+    <div class="next-to-area">
+        <button 
+            class="btn" 
+            (click)="onTranslate()"
+            [disabled]="!translationArea"
+        >Translate</button>
+        <button class="btn"></button>
+        <button class="btn"></button>
+    </div>
+
+</div>
+
+
+<div class="bottom">
+    <button class="btn" (click)="generateTemplate()" [disabled]>GENERATE TEMPLATE</button>
+    <button class="btn"></button>
+    <button class="btn" (click)="scrollTop()">scroll up</button>
+</div>
+
+
+
+
+
