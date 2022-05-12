@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Language } from 'src/app/models/language';
-import { LanguagesService } from 'src/app/services/languages.service';
+import { ReadFileService } from 'src/app/services/read-file.service';
 import { TemplateService } from 'src/app/services/template.service';
+import { Observable } from 'rxjs';
+
+
+// DISPLAY AND MODIFY LOADED TEMPLATE
 
 @Component({
   selector: 'app-template',
@@ -10,22 +13,31 @@ import { TemplateService } from 'src/app/services/template.service';
 })
 export class TemplateComponent implements OnInit {
 
-  content: string = '';
+  contentObs: Observable<string>
+  content: string
 
-  constructor(private template: TemplateService) {
-    this.subscribeContent()
-    this.subscribeStringToTranslate()
-    this.subscribeIdentifier()
-  }
+  private selectedElement: HTMLElement
+  private activeElement: HTMLElement
 
-  ngOnInit(): void {
+  constructor(
+    private template: TemplateService,
+    private readFile: ReadFileService
+  ) {
+
+    this.contentObs = this.readFile.getTextObs()
+    this.readFile.getTextObs().subscribe(c => this.content = c)
+
+    this.template.getIdentifierObs().subscribe((data) =>
+      data && this.setBorderToElementWithIdentifier())
+    
+    this.template.getActiveElementObs().subscribe(e => this.onActiveElement(e))
   }
 
   private innerBefore = ''
 
-  private isElementActive = false
-
-  private activeElement: HTMLElement | null = null
+  
+  ngOnInit(): void { }
+  
 
   onMousemove(event: Event) {
     let element = event.target as HTMLElement;
@@ -40,50 +52,73 @@ export class TemplateComponent implements OnInit {
 
     if (element.childNodes.length === 1 &&
       element.childNodes[0].nodeType === Node.TEXT_NODE
-    ) { this.selectElement(element) }
+    ) {
+      this.selectElement(element)
+    }
 
-    // if (element.childNodes.length > 1) { 
-    //   let txtChildNodes: Node[] = []
-    //   element.childNodes.forEach(child => { 
-    //     if (child.nodeType === Node.TEXT_NODE) {
-    //       txtChildNodes.push(child)
-    //     }
-    //   })
-    // }
   }
 
 
   private selectElement(element: HTMLElement): void {
-    this.setSelectStyles(element)
-    
-    element.onmouseleave = () => this.removeStyles()
-    element.onclick = () => this.activateElement(element)
+    if (!this.activeElement) {
+      this.selectedElement = element
+      this.setSelectStyles(element)
+      
+      element.onmouseleave = () => this.onElementLeave(element)
+      element.onclick = ($event: Event) => {
+        $event.preventDefault()
+        this.clickElement(element)
+      }
+    }
+  }
+
+
+  private onElementLeave(element: HTMLElement): void {
+    if (this.selectedElement) { 
+      this.removeStyles(element)
+      this.selectedElement = null
+    }
   }
   
+
+  private clickElement(element: HTMLElement): void {
+    if (this.selectedElement) {
+      this.template.activeElement = element
+    } else if (this.activeElement) {
+      this.template.activeElement = null
+    }
+  }
+  
+
+  private onActiveElement(element: HTMLElement): void {
+    if (element) {
+      this.activeElement = element
+      this.setActiveStyles(element)
+      this.selectedElement = null
+    } else { 
+      this.removeStyles(this.activeElement)
+      this.activeElement = null
+    }
+  }
   
   private setSelectStyles(element: HTMLElement): void {
-    if (!this.isElementActive) { 
-      this.activeElement = element
+    if (this.selectedElement) { 
       element.style.backgroundColor = '#0073aa'
       element.style.cursor = 'pointer'
       element.style.padding = '.5em .2em'
     }
   }
-  
-  
+
   private setActiveStyles(element: HTMLElement): void {
-    if (!this.isElementActive) { 
+    if (this.activeElement) { 
       element.style.backgroundColor = 'tomato'
       element.style.cursor = 'pointer'
       element.style.padding = '.5em .2em'
     } 
   }
 
-  
-
-  private removeStyles(): void {
-    if (!this.isElementActive) {
-      let element = this.activeElement as HTMLElement
+  private removeStyles(element: HTMLElement): void {
+    if (element) { 
       element.style.backgroundColor = ''
       element.style.cursor = ''
       element.style.padding = ''
@@ -91,21 +126,9 @@ export class TemplateComponent implements OnInit {
   }
 
 
-  private activateElement(element: HTMLElement): void {
-    if (!this.isElementActive) {
-      this.setActiveStyles(element)
-      this.isElementActive = true
-      this.template.setElement(element)
-    } else { 
-      this.isElementActive = false
-      this.removeStyles()
-      this.template.clearElement()
-    }
-  }
 
-
-  setBorderToActiveElement(): void {
-    if (this.activeElement && this.activeElement.hasAttribute('identifier')) {
+  private setBorderToElementWithIdentifier(): void {
+    if (this.activeElement) {
       this.activeElement.style.border = '2px solid #0073aa'
     }
   }
@@ -114,47 +137,6 @@ export class TemplateComponent implements OnInit {
     if (this.activeElement && this.activeElement.hasAttribute('identifier')) {
       this.activeElement.style.border = '2px solid tomato'
     }
-  }
-
-
-  generateTemplateEvent(): void {
-    this.template.generateTemplate(this.content)
-  }
-
-
-
-  
-  private subscribeContent(): void {
-    this.template.getTxt().subscribe(
-      (data) => {
-        this.content = data as string
-      },
-      (error) => console.log(error)
-    )
-  }
-
-
-  private subscribeStringToTranslate(): void {
-    this.template.getStringToTranslate().subscribe(
-      (data) => { 
-        if (!data) {
-          this.isElementActive = false
-          this.removeStyles()
-        }
-      },
-      (error) => console.log(error)
-    )
-  }
-
-
-  private subscribeIdentifier(): void {
-    this.template.getIdentifier().subscribe(
-      (data) => { 
-        if (data) {
-          this.setBorderToActiveElement()
-        }
-      }
-    )
   }
 
 }

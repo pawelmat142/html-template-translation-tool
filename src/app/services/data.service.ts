@@ -1,37 +1,52 @@
 import { Injectable } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/compat/storage'
 import { AngularFirestore } from '@angular/fire/compat/firestore'
-import { TemplateService } from './template.service';
+import { LanguagesService } from './languages.service';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+
+// FIRESTORE INTERFACE
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
 
-  private collection = 'test' 
+  private _collection = 'test'
+  private collectionObs = new BehaviorSubject<string>('');
 
   constructor(
     private firestore: AngularFirestore,
-  ) {
-    // this.subscribeFileName()
+    private language: LanguagesService
+  ) { }
+
+  set collection(c: string) {
+    this._collection = c
+    this.collectionObs.next(c)
   }
 
-  setCollectionName(collection: string) {
-    this.collection = collection
+  get collection(): string { 
+    return this._collection
+  }
+
+  getCollectionObs(): Observable<string> {
+    return this.collectionObs.asObservable()
   }
 
 
-  async addElementIdentifier(originLanguage: string, text: string) {
+  async addElementIdentifier(originText: string) {
     try {
 
+      console.log(this.collection)
+
       let identifier = this.firestore.createId()
-
-      let data = {
-        [originLanguage]: text
-      }
-
-      await this.firestore.collection(`/${this.collection}`).doc(identifier).set(data)
-
+      let data = { [this.language.origin]: originText }
+      
+      await this.firestore
+        .collection(`/${this.collection}`)
+        .doc(identifier)
+        .set(data)
+      
       return identifier as string
 
     } catch (error) { 
@@ -56,21 +71,4 @@ export class DataService {
       return false
     }
   }
-
-
-  // subscribeFileName() { 
-  //   this.template.getFileName().subscribe(
-  //     data => this.fileName = data,
-  //     error => console.log(error)
-  //   )
-  // }
-
-
-}
-
-
-interface Identifier {
-  id: string;
-  english: string;
-  polish: string;
 }

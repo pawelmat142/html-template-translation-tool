@@ -2,6 +2,8 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import { ReadFileService } from "src/app/services/read-file.service";
+
 export const environment = {
   production: false,
 
@@ -17,6 +19,7 @@ export const environment = {
     appId: "1:96638802282:web:d5dc85528f936007972d13",
     measurementId: "G-8GEJCYV696"
   }
+
 };
 
 /*

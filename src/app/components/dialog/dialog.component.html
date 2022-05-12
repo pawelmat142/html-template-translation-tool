@@ -1,10 +1,17 @@
-<h1>{{d.header}}</h1>
+    
+<h1 *ngIf="d.header">{{d.header}}</h1>
 
-
-<ng-container *ngIf="d.okButtons.length">
-    <div *ngFor="let button of d.okButtons;index as index">
-        <button (click)="onOkButton(index); close()">{{button}}</button>
+<ng-container *ngIf="purpose === 'language'">
+    <div *ngFor="let lang of languages; index as index">
+        <button (click)="setLanguage(lang); close()">{{lang}}</button>
     </div>
+</ng-container>
+
+<ng-container *ngIf="purpose === 'collection'">
+    <h1>Wpisz nazwe kolekcji Firestore</h1>
+    <p>coś tam info</p>
+    <input type="text" [(ngModel)]="input">
+    <button (click)="setCollection()">UPDATE COLLECTION NAME</button>
 </ng-container>
 
 <button (click)="close()" class="close">CLOSE</button>

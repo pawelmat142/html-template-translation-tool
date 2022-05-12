@@ -1,8 +1,10 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { Dialog } from 'src/app/models/dialog';
-import { Language } from 'src/app/models/language';
 import { DialogService } from 'src/app/services/dialog.service';
 import { LanguagesService } from 'src/app/services/languages.service';
+
+
+// MODAL WINDOW
 
 @Component({
   selector: 'app-dialog',
@@ -13,29 +15,59 @@ export class DialogComponent implements OnInit {
 
   @HostBinding('class') classes = ''
 
+  input: string = ''
+  languages: string[]
+
   private dialog: Dialog = {
     open: false,
     header: 'elo',
     txt: ['siema'],
+    elements: [],
     closeButtonInner: 'Zamknij',
-    okButtons: []
   }
 
-  constructor(private dialogService: DialogService, private langs: LanguagesService) {
-    this.dialogSubscribe()
+  onClick() { 
+    console.log('onclick')
   }
 
-  get d(): Dialog { return this.dialog  }
+  constructor(
+    private service: DialogService,
+    private language: LanguagesService
+  ) {
+    this.languages = this.language.list
 
-  ngOnInit(): void {
+    this.service.getObs().subscribe((dialog: Dialog) => {
+      if (dialog.open) {
+        this.dialog = dialog;
+        this.open()
+      } else {
+        this.close()
+        setTimeout(() => this.dialog = dialog, 200)
+      }
+    })
   }
 
-  onOkButton(index: number): void {
-    if (this.dialogService.dialogPurpose === 'set language') {
-      this.setLanguage(index)
+  get d(): Dialog { return this.dialog }
+
+  get purpose(): string { return this.service.purpose}
+
+  set header(h: string) {
+    this.dialog.header = h
+  }
+
+  set text(s: string) {
+    if (s === '') {
+      this.dialog.txt = []
+    } else { 
+      this.dialog.txt.push(s)
     }
   }
 
+  set closeButton(s: string) {
+    this.dialog.closeButtonInner = s
+  }
+
+  ngOnInit(): void {}
 
   close(): void { 
     if (this.classes === 'open') {
@@ -44,34 +76,23 @@ export class DialogComponent implements OnInit {
     }
   }
 
-  
-  private open(): void {
+  open(): void {
     if (this.classes === '') { 
       this.classes = 'open'
     }
   }
 
 
-  private dialogSubscribe(): void {
-    this.dialogService.get().subscribe(
-      (dialog: Dialog) => {
-        if (dialog.open) {
-          this.dialog = dialog;
-          this.open()
-        }
-        else { 
-          this.close()
-          setTimeout(() => this.dialog = dialog, 200)
-        }
-      }, error => console.log(error)
-    )
+  setCollection(): void {
+    console.log('setCollection')
+    console.log(this.input)
+  }
+  
+  
+  setLanguage(language: string): void {
+    this.language.toChange = language
+    this.service.purpose = ''
   }
 
-
-  private setLanguage(index: number): void {
-    let language: String = this.langs.list[index]
-    this.langs.set = language
-    this.dialogService.dialogPurpose = ''
-  }
 
 }

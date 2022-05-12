@@ -28,6 +28,7 @@ import { TemplateComponent } from './components/template/template.component';
 
 import { TittlecasePipe } from './pipes/tittlecase.pipe';
 import { DialogComponent } from './components/dialog/dialog.component';
+import { NoSanitizePipe } from './pipes/no-sanitize.pipe';
 
 
 
@@ -50,7 +51,8 @@ import { DialogComponent } from './components/dialog/dialog.component';
     HeaderComponent,
     TemplateComponent,
     TittlecasePipe,
-    DialogComponent
+    DialogComponent,
+    NoSanitizePipe
   ],
   imports: [
     BrowserModule,

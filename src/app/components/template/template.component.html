@@ -1,9 +1,16 @@
 <div 
-    *ngIf="content"
     class="content"
-    [innerHTML]="content"
     (mousemove)="onMousemove($event)"
->
-</div>
+    [innerHTML]="contentObs | async"
+></div>
+<!-- 
+<div class="no-content" *ngIf="!(contentObs | async)">
+    <h1>Load HTML File</h1>
+    <p>warning! do not load untrusted files!</p>
+    <p>code sanitazing is turned off</p>
+</div> -->
 
-<p *ngIf="!content" class="no-content">Load HTML File!</p>
+<app-tool 
+    (translatedEvent)="setBorderToTranslatedElement()"
+></app-tool>
+

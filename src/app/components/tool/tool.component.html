@@ -1,57 +1,130 @@
-<div class="top">
-    <button class="btn notactive">Origin language</button>
-    <button class="btn" (click)="onChooseLanguage()">Translate to language</button>
-    <button 
-        class="btn" 
-        (click)="addIndentifier()" 
-        [disabled]="identifier || !stringToTranslate"
-    >add element identifier</button>
-    
-    <p class="view">{{originLanguage ? (originLanguage | tittlecase): 'load html!' }}</p>
-    <p class="view">{{language ? (language | tittlecase) : 'no data' }}</p>
-    <p class="view">{{identifier ? identifier : 'no identifier' }}</p>
+<div class="bottom">
+
+
+    <div class="myrow">
+
+        <div class="file-input-container">
+            <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+        </div>
+        <div class="file-upload">
+            <p class="filename text-field">{{fileName || "No file..."}}</p>
+            <button mat-mini-fab color="primary" class="upload-btn mybtn" (click)="fileUpload.click()">
+                <mat-icon>attach_file</mat-icon>
+            </button>
+            <button 
+                class="mybtn" 
+                [disabled]="!(stringToTranslateObs | async)" 
+                (click)="onClearButton()"
+            >clear</button>
+        </div>
+
+
+        <div class="collection">
+            <button (click)="onCollection()" class="mybtn">colletion</button>
+            <p class="text-field">{{(collectionObs | async) || 'none...'}}</p>
+        </div>
+
+
+
+        <div class="langs">
+            <div class="mybtn notactive">LANGUAGES</div>
+            <button class="mybtn" disabled>from:</button>
+            <p class="text-field">{{(originLanguageObs | async | tittlecase)  || "none..." }}</p>
+            <button class="mybtn" (click)="onChooseLanguage()">_to_:   </button>
+            <p class="text-field">{{(toChangeLanguageObs | async | tittlecase)  || "none..." }}</p>
+        </div>
+        
+        
+            
+        <div class="right">
+            <div></div>
+
+            <button class="mybtn" (click)="onLogout()">LOGOUT</button>
+        </div>
+
+    </div>
+
+
 </div>
+
+
+
+<div class="left">
+    
+
+    <div class="identifier">
+        <button 
+            class="mybtn" 
+            (click)="addIndentifier()" 
+            [disabled]="(identifierObs | async) || !(stringToTranslateObs | async)"
+        >IDENTIFIER:</button>
+        <p class="text-field">{{(identifierObs | async | tittlecase)  || "none..." }}</p>
+    </div>
+
+
+    <textarea disabled >{{stringToTranslateObs | async}}</textarea>
+    
+    <div class="left-middle">
+        <div></div>
+        <button 
+            class="mybtn" 
+            (click)="onClearButton()"
+            [disabled]="!(stringToTranslateObs | async)"
+        >unselect</button>
+    </div>
+    
+    <textarea 
+        [disabled]="!(identifierObs | async) || !(stringToTranslateObs | async) || (toChangeLanguageObs | async) === 'none'"
+        [(ngModel)]="translationArea">
+    </textarea>
+
+    <button class="mybtn" (click)="onTranslate()" [disabled]="!translationArea">TRANSLATE</button>
+
+
+</div>
+
+
+
+
+
+
+<!-- 
 
 <div class="middle">
 
-    <textarea disabled >{{stringToTranslate}}</textarea>
+    <textarea disabled >{{stringToTranslateObs | async}}</textarea>
     
     <div class="next-to-area">
         <button 
-            class="btn" 
-            (click)="clearStringToTranslate()"
-            [disabled]="!stringToTranslate"
-        >clear</button>
-        <button class="btn">cos</button>
-        <button class="btn"></button>
+            class="mybtn" 
+            (click)="onClearButton()"
+            [disabled]="!(stringToTranslateObs | async)"
+        >unselect</button>
+        <button class="mybtn">cos</button>
+        <button class="mybtn"></button>
     </div>
     
-    
     <textarea 
-        [disabled]="!identifier || !stringToTranslate || !language" 
+        [disabled]="!(identifierObs | async) || !(stringToTranslateObs | async) || (toChangeLanguageObs | async) === 'none'"
         [(ngModel)]="translationArea">
     </textarea>
     
     <div class="next-to-area">
         <button 
-            class="btn" 
+            class="mybtn" 
             (click)="onTranslate()"
             [disabled]="!translationArea"
         >Translate</button>
-        <button class="btn"></button>
-        <button class="btn"></button>
+        <button class="mybtn"></button>
+        <button class="mybtn"></button>
     </div>
 
 </div>
 
 
-<div class="bottom">
-    <button class="btn" (click)="generateTemplate()" [disabled]>GENERATE TEMPLATE</button>
-    <button class="btn"></button>
-    <button class="btn" (click)="scrollTop()">scroll up</button>
+<div class="bottomm">
+    <button class="mybtn" (click)="generateTemplate()" [disabled]>GENERATE TEMPLATE</button>
+    <button class="mybtn" (click)="lolEvent.emit()">lol</button>
+    <button class="mybtn" (click)="scrollTop()">scroll up</button>
 </div>
-
-
-
-
-
+ -->

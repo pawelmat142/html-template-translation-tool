@@ -31,7 +31,7 @@ button:hover {
 
 .filename {
     background-color: #7fcef4;
-    padding: 0.3em;
+    padding: 0.3em .6em;
     border-radius: 0.5em;
     justify-self: flex-start!important;
     display: flex;
@@ -44,5 +44,22 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+
+/* collection */
+.collection {
+    width: 100%;
+    padding: 0.3em .6em;
+    background-color: #7fcef4;
+    border-radius: 0.5em;
+    
+    display: flex;
+    align-items: center;
+    gap: 2em;
+}
+
+.collection .name {
+    font-weight: bold;
 }
 

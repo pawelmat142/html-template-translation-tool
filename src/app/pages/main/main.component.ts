@@ -1,5 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { TemplateComponent } from 'src/app/components/template/template.component';
+import { ToolComponent } from 'src/app/components/tool/tool.component';
+
+// MAIN VIEW AFTER AUTHORIZATION - CONTAINS TEMPLATE AND TOOLS
 
 @Component({
   selector: 'app-main',
@@ -7,23 +10,6 @@ import { TemplateComponent } from 'src/app/components/template/template.componen
   styleUrls: ['./main.component.css']
 })
 export class MainComponent implements OnInit {
-
-
   constructor() { }
-
-  ngOnInit(): void {
-  }
-
-  @ViewChild(TemplateComponent) t: TemplateComponent| any
-
-  translatedEvent(isTranslated: boolean) {
-    if (isTranslated) {
-      this.t.setBorderToTranslatedElement(isTranslated)
-    }
-  }
-
-  generateTemplateEvent() {
-    this.t.generateTemplateEvent()
-  }
-
+  ngOnInit(): void {}
 }

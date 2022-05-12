@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { TemplateService } from 'src/app/services/template.service';
-// import * as cloneDeep from 'lodash/cloneDeep';
+import { DataService } from 'src/app/services/data.service';
+import { ReadFileService } from 'src/app/services/read-file.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -12,12 +13,16 @@ export class HeaderComponent implements OnInit {
 
   fileName: string = ''
 
+  collectionObs: Observable<string>
+
   constructor(
     private auth: AuthenticationService,
-    private template: TemplateService
+    private readFile: ReadFileService,
+    private db: DataService
   ) { 
 
-    this.fileNameSubscribe()
+    this.readFile.getFileObs().subscribe((f: File) => this.fileName = f ? f.name : '')
+    this.collectionObs = this.db.getCollectionObs()
   }
 
   ngOnInit(): void {
@@ -27,18 +32,23 @@ export class HeaderComponent implements OnInit {
     this.auth.logout()
   }
 
+  
   onFileSelected(event: any) {
-    // const file = cloneDeep(event.target.files[0])
     const file = event.target.files[0] as File
     if (this.htmlFile(file)) {
-      // this.template.setFileName(file.name)
-      this.template.setFile(file)
+
+      this.readFile.file = file
+
     } else { 
       this.fileName = ''
-      this.template.clear()
       throw new Error('file has to be HTML')
     }
   }
+
+  onRemoveFile(): void {
+    this.readFile.file = null
+  }
+
 
   private htmlFile(file: File): boolean {
     if (file.name.split('.').pop() === 'html') {
@@ -46,14 +56,6 @@ export class HeaderComponent implements OnInit {
     } else { 
       return false
     }
-  }
-
-
-  private fileNameSubscribe() { 
-    this.template.getFileName().subscribe(
-      (data) => this.fileName = data,
-      (error) => console.log(error)
-    )
   }
 
 }

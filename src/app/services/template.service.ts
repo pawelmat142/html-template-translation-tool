@@ -1,201 +1,156 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, map, catchError} from 'rxjs';
+import { TemplateComponent } from '../components/template/template.component';
 import { Language } from '../models/language';
 import { DataService } from './data.service';
 import { DialogService } from './dialog.service';
 import { LanguagesService } from './languages.service';
+import { ReadFileService } from './read-file.service';
+
+
+// STORES AND MODIFY CURRENT LOADED TEMPLATE VIEW
 
 @Injectable({
   providedIn: 'root'
 })
 export class TemplateService {
 
-  private fileTxt = new Subject<String>();
+  private activeElementObs = new BehaviorSubject<HTMLElement>(null)
+  private _activeElement: HTMLElement 
+  
+  private identifierObs = new BehaviorSubject<string>('')
+  private _identifier: string
 
-  fileName: string = ''
-  private fileNameObs = new Subject<string>();
 
-  private activeElement: HTMLElement | null = null
-  private activeElementObs = new Subject<HTMLElement | null>()
-
-  private stringToTranslate: string = ''
-  private stringToTranslateObs = new Subject<string>()
-
-  private identifierObs = new Subject<String>()
-
-  private originLanguage: string = ''
+  private stringToTranslateObs = new BehaviorSubject<string>('')
+  private _stringToTranslate: string = ''
 
   constructor(
-    private lang: LanguagesService,
     private db: DataService,
-    private diaglog: DialogService
+    private readFile: ReadFileService,
+    private dialog: DialogService,
   ) {
-    this.subscribeElement()
-    this.subscribeFileName()
-    this.subscribeOriginLanguage()
-    this.subscribeStringToTranslate()
+
+    this.activeElementObs.subscribe(e => this.onActiveElement(e))
   }
 
+  // ACTIVE ELEMENT
 
-  // fileTxt
-
-  async setFile(file: File | null) {
-    if (file) {
-      this.fileNameObs.next(file.name)
-      const txt = await file.text()
-      this.lang.setOriginLanguage(txt)
-      this.fileTxt.next(txt)
-    } else { 
-      this.fileNameObs.next('')
-      this.fileTxt.next('')
-      this.lang.setOriginLanguage('')
-    }
+  get activeElement(): HTMLElement {
+    return this._activeElement
   }
 
-  getTxt(): Observable<String> {
-    return this.fileTxt.asObservable();
+  set activeElement(e: HTMLElement) {
+    this.activeElementObs.next(e)
   }
 
-  clear() { 
-    this.setFile(null)
-  }
-
-
-  // fileName
-
-  getFileName(): Observable<string> {
-    return this.fileNameObs.asObservable()
-  }
-
-
-
-  // Element
-
-  setElement(element: HTMLElement) {
-    this.activeElementObs.next(element)
-  }
-
-  getElement(): Observable<HTMLElement|null> { 
+  getActiveElementObs(): Observable<HTMLElement> { 
     return this.activeElementObs.asObservable()
   }
 
-  clearElement() {
-    this.activeElementObs.next(null)
-    this.identifierObs.next('')
+  onActiveElement(element: HTMLElement): void {
+    this._activeElement = element
+    if (element) {
+      this.setIdentifierIfExist(element)
+      let txt = this.unescapeHTML(element.innerHTML)
+      this.stringToTranslate = txt
+    } else {
+      this.stringToTranslateObs.next('')
+    }
   }
 
 
+  // STRING TO TRANSLATE
+  get stringToTranslate(): string {
+    return this._stringToTranslate
+  }
 
-  getStringToTranslate(): Observable<String> { 
+  set stringToTranslate(s: string) {
+    this.stringToTranslateObs.next(s)
+    this._stringToTranslate = s
+  }
+
+  getStringToTranslateObs(): Observable<string> { 
     return this.stringToTranslateObs.asObservable()
   }
 
-  clearStringToTranslate(): void { 
-    this.stringToTranslateObs.next('')
-    this.identifierObs.next('')
+
+
+  // IDENTIFIER
+  get identifier(): string {
+    return this._identifier
   }
 
+  getIdentifierObs(): Observable<string> {
+    return this.identifierObs.asObservable()
+  }
+
+  set identifier(i: string) {
+    this.identifierObs.next(i)
+    this._identifier = i
+    console.log('set identifier ' + i)
+  }
 
   async addIdentifierToElement() {
     if (this.activeElement) {
-      let atrrtibute = this.activeElement.getAttribute('identifier')
-      if (atrrtibute) {
-        this.identifierObs.next(atrrtibute)
-      } else {
-        console.log(this.activeElement)
 
+      let atrrtibute = this.activeElement.getAttribute('identifier')
+      if (!atrrtibute) {
         let identifier = (await this.db
-          .addElementIdentifier(this.originLanguage, this.stringToTranslate))
+          .addElementIdentifier(this.stringToTranslate))
           .toString()
         
         if (identifier) {
-          this.activeElement.setAttribute('identifier', identifier)
-          this.identifierObs.next(identifier)
-        } else this.identifierObs.next('')
+          let modified:boolean = await this.addIdentifierToReadFile(identifier)
+          if (modified) {
+            this.identifier = identifier
+            this.activeElement.setAttribute('identifier', identifier)
+          } else this.identifier = ''
+        } else this.identifier = ''
       }
     }
   }
 
 
-  getIdentifier(): Observable<String> {
-    return this.identifierObs.asObservable()
+  private async addIdentifierToReadFile(identifier: string): Promise<boolean> {
+    let styles = this.activeElement.getAttribute('style')
+    this.activeElement.removeAttribute('style')
+    let elementAsTxt = this.unescapeHTML(await this.activeElement.outerHTML)
+    this.activeElement.setAttribute('style', styles)
+    let readFile = this.unescapeHTML(this.readFile.text)
+    if (readFile.includes(elementAsTxt)) {
+      let newElementAsText = elementAsTxt.replace('>', ` identifier="${identifier}">`) 
+      let newReadFile = readFile.replace(elementAsTxt, newElementAsText)
+      if (readFile !== newReadFile) {
+        this.readFile.text = newReadFile
+        this.setDialogIdentifierAdded()
+        return true
+      } else throw new Error('replacing error')
+    } else throw new Error('didnt find this part')
   }
 
 
-  async generateTemplate(template: string) {
-    if (this.fileName) {
-      this.download(this.fileName + '_template.html', template)
-    } else {
-      this.diaglog.clearDialog()
-      this.diaglog.header = 'Not any file loaded'
-      this.diaglog.open()
-    }
-  }
-
+  
     
-  private subscribeElement(): void {
-    this.getElement().subscribe(
-      (element: HTMLElement | null) => {
-        if (element) {
-          this.activeElement = element as HTMLElement
-          this.solveIdentifier(element)
-          let txt = this.unescapeHTML(element.innerHTML)
-          txt = this.unescapeHTML(txt)
-          this.stringToTranslateObs.next(txt)
-        } else this.stringToTranslateObs.next('')
-      },
-      (error) => console.log(error)
-    )
-  }
 
-
-  private subscribeFileName(): void {
-    this.fileNameObs.subscribe(
-      data => { 
-        this.fileName = data.split('.').shift() as string
-        this.db.setCollectionName(this.fileName)
-      },
-      error => console.log(error)
-    )
-  }
-
-
-  private subscribeOriginLanguage(): void {
-    this.lang.getOrigin().subscribe(
-      (data) => this.originLanguage = data ? data.name : '',
-      error => console.log(error)
-    )
-  }
-
-  private subscribeStringToTranslate(): void {
-    this.stringToTranslateObs.subscribe(
-      (data) => this.stringToTranslate = data,
-      error => console.log(error)
-    )
-  }
-
-
-    
   private unescapeHTML(escapedHTML: string): string {
     return escapedHTML.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ');
   }
 
 
-  private solveIdentifier(element: HTMLElement): void {
+  private setIdentifierIfExist(element: HTMLElement): void {
     let identifier = element.getAttribute('identifier')
     if (identifier) {
-      this.identifierObs.next(identifier)
+      this.identifier = identifier
+    } else { 
+      this.identifier = ''
     }
   }
 
-
-  private download(filename:string, textInput:string) {
-    var element = document.createElement('a');
-    element.setAttribute('href','data:text/plain;charset=utf-8, ' + encodeURIComponent(textInput));
-    element.setAttribute('download', filename);
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  private setDialogIdentifierAdded(): void {
+    this.dialog.clearDialog()
+    this.dialog.header = "Identifier added!"
+    this.dialog.open()
   }
   
 }

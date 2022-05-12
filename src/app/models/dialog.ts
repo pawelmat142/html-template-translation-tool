@@ -2,8 +2,8 @@ export interface Dialog {
   open: Boolean,
   header: String,
   txt: String[],
+  elements: string[],
   closeButtonInner: String,
-  okButtons: string[]
 }
 
 export interface DialogButton { 

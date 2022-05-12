@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { Dialog, DialogButton } from '../models/dialog';
 import { LanguagesService } from './languages.service';
 
@@ -8,22 +8,26 @@ import { LanguagesService } from './languages.service';
 })
 export class DialogService {
 
-  private dialogObs = new Subject<Dialog>()
 
-  dialogPurpose: string = ''
+  // DIALOG MODAL WINDOW MANIPULATION
+
+  purpose: string = ''
+  languages: string[]
 
   private dialog: Dialog = {
     open: false,
     header: 'elo',
     txt: ['siema'],
+    elements: [],
     closeButtonInner: 'CLOSE',
-    okButtons: []
+  }
+  private dialogObs = new BehaviorSubject<Dialog>(this.dialog)
+
+  constructor(private language: LanguagesService) {
+    this.languages = this.language.list
   }
 
-  constructor(private langs: LanguagesService) { 
-  }
-
-  get(): Observable<Dialog> {
+  getObs(): Observable<Dialog> {
     return this.dialogObs.asObservable()
   }
 
@@ -42,39 +46,53 @@ export class DialogService {
   }
 
   set txt(t: string) {
-    this.dialog.txt.push(t)
+    if (t === '') {
+      this.dialog.txt = []
+    } else { 
+      this.dialog.txt.push(t)
+    }
   }
 
   set closeButtonInner(t: string) {
     this.dialog.closeButtonInner = t
   }
 
-  set okButton(button: string) {
-    this.dialog.okButtons.push(button)
+
+  set element(elAsText: string) {
+    if (elAsText === '') {
+      this.dialog.elements = []
+    } else { 
+      this.dialog.elements.push(elAsText)
+    }
   }
+
   
   private go() { 
     this.dialogObs.next(this.dialog)
   }
 
+
   clearDialog() { 
     this.dialog.header = ''
     this.dialog.txt = []
     this.dialog.closeButtonInner = 'CLOSE'
-    this.dialog.okButtons = []
+    this.dialog.elements = []
+    this.purpose = ''
   }
 
+
   chooseLanguageSet(): void {
-    this.dialogPurpose = 'set language'
+    this.purpose = 'language'
     this.dialog = {
       open: true,
       header: 'Choose Language:',
       txt: ['aaa', 'bbb', 'ccc'],
+      elements: null,
       closeButtonInner: 'Close',
-      okButtons: this.langs.list as string[]
+      // okButtons: this.langs.list as string[]
     }
   }
 
-
+  
 }
 

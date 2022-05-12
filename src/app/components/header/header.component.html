@@ -24,8 +24,13 @@
     </button>
 </div>
 
-
 <div>
-    <button>action</button>
+    <button (click)="onRemoveFile()">Remove file</button>
+</div>
+
+
+<div class="collection">
+    <p>db collection name:</p>
+    <p class="name">{{(collectionObs | async) }}</p>
 </div>
 

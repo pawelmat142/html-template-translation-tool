@@ -7,6 +7,9 @@ import { Observable, BehaviorSubject, Subject } from 'rxjs';
 })
 export class LanguagesService {
 
+
+  // STORES DATA ABOUT CURRENT TEMPLATE LANGUAGE OR WHICH LANGUAGE TRANSLATE TO
+
   private langs: Language[] = [
     {
       name: 'english',
@@ -49,31 +52,66 @@ export class LanguagesService {
     }
   ]
 
-  private current = new Subject<Language>()
-
-  private origin = new Subject<Language | null>()
-
-  constructor() { }
-
-  get list(): String[] { 
-    return this.langs.map(l => l.name)
-  }
-
-  get get(): Observable<Language> { 
-    return this.current.asObservable()
+  private initial: Language = {
+    name: 'none',
+    origin: 'none',
+    code: 'nn'
   }
 
   
-  set set(name: String) { 
-    if (this.list.includes(name)) {
-      const lang = this.langs.find(l => l.name === name) as Language
-      this.current.next(lang)
-    } else throw new Error('no such language')
+  private originObs = new BehaviorSubject<Language>(this.initial)
+  private _origin: Language
+
+  private toChangeObs = new BehaviorSubject<Language>(this.initial)
+  private _toChange: Language
+
+
+  constructor() {
+    this.originObs.subscribe(l => this._origin = l)
+    this.toChangeObs.subscribe(l => this._toChange = l)
+  }
+
+  
+  get list(): string[] { 
+    return this.langs.map(l => l.name)
   }
 
 
-  getOrigin(): Observable<Language | null> { 
-    return this.origin.asObservable()
+  get origin(): string { 
+    return this._origin.name
+  }
+
+  get originFull(): Language { 
+    return this._origin
+  }
+
+  getOriginObs(): Observable<Language> { 
+    return this.originObs.asObservable()
+  }
+
+
+  setOriginLanguage(txt: string): void {
+    let position = txt.search('lang="')
+    if (position) { 
+      let langCode = txt.substr(position + 6, 2)
+      let result = this.getByCode(langCode)
+      if (result) this.originObs.next(result)
+      else this.originObs.next(this.initial)
+    } else throw new Error('lang code not found!')
+  }
+
+
+
+  get toChange(): string { 
+    return this._toChange.name
+  }
+
+  get toChangeFull(): Language { 
+    return this._toChange
+  }
+
+  getToChangeObs(): Observable<Language> {
+    return this.toChangeObs.asObservable()
   }
 
   getByName(name: String): Language { 
@@ -85,23 +123,12 @@ export class LanguagesService {
     return this.langs.find(l => l.code === code) as Language
   }
 
-  setOriginLanguage(txt: String): void {
-    let position = txt.search('lang="')
-    if (position) { 
-      let langCode = txt.substr(position + 6, 2)
-      let result = this.getByCode(langCode)
-      if (result) this.origin.next(result)
-      else this.origin.next(null)
-    } else throw new Error('lang code not found!')
+  set toChange(name: string) { 
+    if (this.list.includes(name)) {
+      const lang = this.langs.find(l => l.name === name) as Language
+      this.toChangeObs.next(lang)
+      this._toChange = lang
+    } else throw new Error('no such language')
   }
-
-  lol(): void {
-    console.log('lol')
-  }
-
-
-  
-
-
 
 }
