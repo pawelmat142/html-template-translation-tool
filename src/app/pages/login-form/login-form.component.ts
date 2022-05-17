@@ -59,7 +59,7 @@ export class LoginFormComponent implements OnInit {
       
     } catch (error) {
       this.errorMsg = 'Login failed'
-      setTimeout(() => this.errorMsg = '', 2000)
+      setTimeout(() => this.errorMsg = '', 10000)
     }
   }
 

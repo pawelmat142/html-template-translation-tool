@@ -1,8 +1,11 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { Dialog } from 'src/app/models/dialog';
+import { Collection } from 'src/app/models/collection';
+import { DataService } from 'src/app/services/data.service';
 import { DialogService } from 'src/app/services/dialog.service';
 import { LanguagesService } from 'src/app/services/languages.service';
-
+import { Observable } from 'rxjs';
+import { ReadFileService } from 'src/app/services/read-file.service';
 
 // MODAL WINDOW
 
@@ -18,25 +21,28 @@ export class DialogComponent implements OnInit {
   input: string = ''
   languages: string[]
 
+  collectionsObs: Observable<Collection[]>
+  collections: Collection[]
+
+  fileName: string = ''
+
   private dialog: Dialog = {
     open: false,
-    header: 'elo',
-    txt: ['siema'],
-    elements: [],
-    closeButtonInner: 'Zamknij',
-  }
-
-  onClick() { 
-    console.log('onclick')
+    header: 'initial',
+    txt: [],
   }
 
   constructor(
     private service: DialogService,
-    private language: LanguagesService
+    private language: LanguagesService,
+    private db: DataService,
+    private readFile: ReadFileService,
   ) {
     this.languages = this.language.list
 
-    this.service.getObs().subscribe((dialog: Dialog) => {
+    this.readFile.getFileObs().subscribe(f => this.fileName = f.name)
+
+    this.service.getObs().subscribe((dialog: any) => {
       if (dialog.open) {
         this.dialog = dialog;
         this.open()
@@ -63,9 +69,6 @@ export class DialogComponent implements OnInit {
     }
   }
 
-  set closeButton(s: string) {
-    this.dialog.closeButtonInner = s
-  }
 
   ngOnInit(): void {}
 
@@ -82,13 +85,11 @@ export class DialogComponent implements OnInit {
     }
   }
 
-
-  setCollection(): void {
-    console.log('setCollection')
-    console.log(this.input)
+  onConfirm(): void {
+    console.log(this.purpose)
   }
-  
-  
+
+
   setLanguage(language: string): void {
     this.language.toChange = language
     this.service.purpose = ''

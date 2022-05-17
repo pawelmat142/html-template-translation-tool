@@ -1,59 +1,84 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
-import { GoogleAuthProvider, GithubAuthProvider } from '@angular/fire/auth'
+import { AngularFirestore } from '@angular/fire/compat/firestore'
+import { GoogleAuthProvider, GithubAuthProvider, User } from '@angular/fire/auth'
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
 
+  private user: User = null
+
   constructor(
     private fireauth: AngularFireAuth,
-    private router: Router
-  ) { }
+    private firestore: AngularFirestore,
+    private router: Router,
+  ) { 
+    
+    this.getUserState().subscribe(result => {
+      if (result) {
+        this.user = result
+        localStorage.setItem('uid', this.user.uid)
+        setTimeout(() =>this.router.navigate['projects'],200)
+      }
+      else { 
+        this.user = null
+        localStorage.removeItem('uid')
+        this.router.navigate(['login'])
+      }
+    })
+  }
+  
+  getUserState(): Observable<any> { 
+    return this.fireauth.authState
+  }
+  
+  get logged(): boolean {
+    return this.user !== null ? true : false;
+  }
+
+  get uid(): string {
+    return this.user.uid
+  }
 
 
   async login(email: string, password: string) { 
     try {
-
       let result = await this.fireauth
         .signInWithEmailAndPassword(email, password)
       
-      localStorage.setItem('token', 'true')
-
-      if (result.user?.emailVerified == true) {
-        setTimeout(() => this.router.navigate(['main']), 300)
-      } else { 
-        setTimeout(() => this.router.navigate(['varify-email']), 300)
-      }
-      
+      if (result.user) {
+        setTimeout(() => this.router.navigate(['projects']), 1000)
+      } 
       return true
-
     } catch (error) { return error }
   }
 
 
   async register(email: string, password: string) { 
     try { 
-      
       let result = await this.fireauth
         .createUserWithEmailAndPassword(email, password)
-      await this.sendEmailVerification(result.user)
-
+        
+      let r = await this.firestore
+        .collection(`/appProjects`)
+        .doc(result.user.uid)
+        .set({})
+      
+      this.router.navigate(['login'])
       return true
-
     } catch (error) { return error }
   }
 
 
   async logout() { 
     try {
-
+      
       let result = await this.fireauth.signOut()
-      this.router.navigate(['login'])
-      localStorage.removeItem('token')
-    
       return true
     }
     catch (error) { 
@@ -66,12 +91,9 @@ export class AuthenticationService {
 
   async forgotPassword(email: string) {
     try { 
-
       let result = await this.fireauth
         .sendPasswordResetEmail(email)
-      
       this.router.navigate(['varify-email'])
-      
       return true
       
     } catch (error) {
@@ -79,20 +101,6 @@ export class AuthenticationService {
     }
   }
 
-
-
-  async sendEmailVerification(user: any) {
-    try { 
-
-      let result = await user.sendEmailVerification()
-      setTimeout(() => this.router.navigate(['varify-email']), 1000)
-      
-      return true
-
-    } catch (error) {
-      return false
-    }
-  }
 
 
 
@@ -101,11 +109,10 @@ export class AuthenticationService {
 
       let result = await this.fireauth
         .signInWithPopup(new GoogleAuthProvider)
-      console.log('result')
-      console.log(result)
 
+      this.user = result.user
+      localStorage.setItem('uid', this.user?.uid)
       this.router.navigate(['main'])
-      localStorage.setItem('token', JSON.stringify(result.user?.uid))
 
       return true
 
@@ -114,6 +121,7 @@ export class AuthenticationService {
       return false 
     }
   }
+
 
   async githubLogin() { 
     try {
@@ -133,10 +141,5 @@ export class AuthenticationService {
       return false 
     }
   }
-
-
-
-  // async 
-
 
 }

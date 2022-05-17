@@ -29,7 +29,6 @@ export class ReadFileService {
 
   set name(n: string) {
     this._name = n
-    this.db.collection = n.split('.').shift()
   }
 
   get name() {
@@ -42,6 +41,8 @@ export class ReadFileService {
 
 
   set file(f: File) {
+    console.log('set')
+    console.log(f)
     this.fileObs.next(f)
     this._file = f
     this.setTextWhenSetFile(f)
@@ -53,12 +54,6 @@ export class ReadFileService {
 
     this.texSanitized = this.domSanitizer.bypassSecurityTrustHtml(this._text)
     let a = this.domSanitizer
-    console.log(a)
-    console.log(a.toString())
-
-
-    // console.log(this.texSanitized)
-    // console.log(this.texSanitized as string)
 
     this.textObs.next(this.texSanitized as string)
     this.language.setOriginLanguage(this._text)
@@ -69,9 +64,7 @@ export class ReadFileService {
     return this._file
   }
 
-  getFileObs(): Observable<File> {
-    return this.fileObs.asObservable()
-  }
+  getFileObs() {return this.fileObs.asObservable()}
 
 
   set text(t: string) {

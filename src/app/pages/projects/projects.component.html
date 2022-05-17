@@ -1,0 +1,63 @@
+
+<div class="mycontainer">
+
+    <h3>SET PROJECT:</h3>
+
+    <div class="projects">
+
+        <div class="myrow head">
+            <p>PROJECT:</p>
+            <p>FILENAME:</p>
+            <p>MODIFIED:</p>
+            <p>TIME:</p>
+        </div>
+
+        <div class="myrow" *ngFor="let project of collections">
+            <p>{{project.name}}</p>
+            <p>{{project.filename}}</p>
+            <p>{{project.modified.split(' ').shift()}}</p>
+            <p>{{project.modified.split(' ').pop()}}</p>
+            <div class="mybtn center">
+                <button (click)="onSetProject(project)">SET</button>
+            </div>
+            <div class="mybtn center red">
+                <button (click)="onDelete(project)">delete</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    
+    <div *ngIf="inputOpen" class="add-project">
+        
+        <div>
+            <label>file name:</label>
+            <p class="myinput" disabled>{{filenameAdding || "Choose file ..."}}</p>
+        </div>
+        <div>
+            <label>project name:</label>
+            <input type="text" placeholder="set project name..." [(ngModel)]="input">
+        </div>
+        <div class="mybtn center">
+            <button (click)="onAddNewProject()" [disabled]="!input">ADD PROJECT</button>
+        </div>
+    </div>
+    
+    <div class="file-input-container">
+        <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+    </div>
+
+
+    <div class="mybtn center">
+        <button 
+        (click)="inputOpen ? rejectAddingProject() : fileUpload.click()" 
+        [innerHTML]="inputOpen ? 'REJECT' : 'ADD NEW PROJECT'"
+        ></button>
+    </div>
+
+    <div class="mybtn center">
+        <button (click)="logout()">LOGOUT</button>
+    </div>
+
+</div>

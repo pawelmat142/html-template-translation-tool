@@ -1,7 +1,13 @@
+
+<app-tool 
+    (translatedEvent)="setBorderToTranslatedElement()"
+></app-tool>
+
 <div 
     class="content"
     (mousemove)="onMousemove($event)"
-    [innerHTML]="contentObs | async"
+    [innerHTML]="templateTxt"
+    #contentReference
 ></div>
 <!-- 
 <div class="no-content" *ngIf="!(contentObs | async)">
@@ -10,7 +16,4 @@
     <p>code sanitazing is turned off</p>
 </div> -->
 
-<app-tool 
-    (translatedEvent)="setBorderToTranslatedElement()"
-></app-tool>
 

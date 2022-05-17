@@ -1,17 +1,22 @@
+
+<div class="dialog mycontainer">
+
+    <h1 *ngIf="d.header">{{d.header}}</h1>
     
-<h1 *ngIf="d.header">{{d.header}}</h1>
-
-<ng-container *ngIf="purpose === 'language'">
-    <div *ngFor="let lang of languages; index as index">
-        <button (click)="setLanguage(lang); close()">{{lang}}</button>
+    <p *ngFor="let text of d.txt">{{text}}</p>
+    
+    <div class="mybtn full">
+        <button *ngIf="d.confirmFunction" (click)="d.confirmFunction(); close()">CONFIRM</button>
     </div>
-</ng-container>
+    
+    <ng-container *ngIf="purpose === 'language'">
+        <div *ngFor="let lang of languages; index as index" class="mybtn full">
+            <button (click)="setLanguage(lang); close()">{{lang}}</button>
+        </div>
+    </ng-container>
+    
+    <div class="mybtn red full">
+        <button (click)="close()" class="close">CLOSE</button>
+    </div>
 
-<ng-container *ngIf="purpose === 'collection'">
-    <h1>Wpisz nazwe kolekcji Firestore</h1>
-    <p>coś tam info</p>
-    <input type="text" [(ngModel)]="input">
-    <button (click)="setCollection()">UPDATE COLLECTION NAME</button>
-</ng-container>
-
-<button (click)="close()" class="close">CLOSE</button>
+</div>

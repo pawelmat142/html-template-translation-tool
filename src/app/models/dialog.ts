@@ -1,9 +1,8 @@
 export interface Dialog {
-  open: Boolean,
-  header: String,
-  txt: String[],
-  elements: string[],
-  closeButtonInner: String,
+  open: boolean,
+  header: string,
+  txt: string[],
+  confirmFunction?: Function,
 }
 
 export interface DialogButton { 

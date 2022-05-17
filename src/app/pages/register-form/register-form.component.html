@@ -1,5 +1,5 @@
 <form 
-    class="form one"
+    class="form one mycontainer"
     [formGroup]="registerForm" 
     (ngSubmit)="onSubmit()" 
     (keyup.escape)="registerForm.reset()"
@@ -27,9 +27,14 @@
         <input type="password" formControlName="confirmPassword" autocomplete="off">
     </div>
 
-    <button [disabled]="registerForm.invalid">Register</button>
-
-    <button type="button" [routerLink]="['/login']">back</button>
+    <div class="mybtn full">
+        <button [disabled]="registerForm.invalid">Register</button>
+    </div>
+    
+    <div class="mybtn full">
+        <button type="button" [routerLink]="['/login']">back</button>
+    </div>
+        
 
     <p class="message red" *ngIf="errorMsg">{{errorMsg}}</p>
     <p class="message" *ngIf="message">{{message}}</p>

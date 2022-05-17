@@ -1,64 +1,66 @@
-<div class="bottom">
+<!-- BOTTOM BAR -->
 
-
+<div class="bottom tool-bg">
     <div class="myrow">
 
-        <div class="file-input-container">
-            <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
-        </div>
-        <div class="file-upload">
+        <div>
+            <p class="title">filename:</p>
             <p class="filename text-field">{{fileName || "No file..."}}</p>
-            <button mat-mini-fab color="primary" class="upload-btn mybtn" (click)="fileUpload.click()">
-                <mat-icon>attach_file</mat-icon>
-            </button>
-            <button 
-                class="mybtn" 
-                [disabled]="!(stringToTranslateObs | async)" 
-                (click)="onClearButton()"
-            >clear</button>
         </div>
 
-
-        <div class="collection">
-            <button (click)="onCollection()" class="mybtn">colletion</button>
-            <p class="text-field">{{(collectionObs | async) || 'none...'}}</p>
+        <div>
+            <p class="title">project:</p>
+            <p class="filename text-field">{{projectName || "No project..."}}</p>
         </div>
-
-
 
         <div class="langs">
-            <div class="mybtn notactive">LANGUAGES</div>
-            <button class="mybtn" disabled>from:</button>
+            <div class="title">LANGUAGES</div>
+            <div class="mybtn min blue">
+                <button disabled>from:</button>
+            </div>
             <p class="text-field">{{(originLanguageObs | async | tittlecase)  || "none..." }}</p>
-            <button class="mybtn" (click)="onChooseLanguage()">_to_:   </button>
+            <div class="mybtn min blue">
+                <button (click)="onChooseLanguage()">to:   </button>
+            </div>
             <p class="text-field">{{(toChangeLanguageObs | async | tittlecase)  || "none..." }}</p>
         </div>
         
-        
-            
-        <div class="right">
+        <div class="right"> 
             <div></div>
-
-            <button class="mybtn" (click)="onLogout()">LOGOUT</button>
+            <div class="mybtn">
+                <button (click)="onSave()">SAVE</button>
+            </div>
+            <div class="mybtn red">
+                <button (click)="onLeave()">PROJECTS</button>
+            </div>
+            <div class="mybtn red">
+                <button (click)="onLogout()">LOGOUT</button>
+            </div>
         </div>
 
     </div>
-
-
 </div>
 
 
+<!-- LEFT BAR -->
 
-<div class="left">
+<div class="left tool-bg">
     
-
-    <div class="identifier">
-        <button 
-            class="mybtn" 
-            (click)="addIndentifier()" 
-            [disabled]="(identifierObs | async) || !(stringToTranslateObs | async)"
-        >IDENTIFIER:</button>
+    <div class="identifier cont">
+        <p class="title">IDENTIFIER:</p>
         <p class="text-field">{{(identifierObs | async | tittlecase)  || "none..." }}</p>
+        <div class="mybtn full red">
+            <button 
+                (click)="removeIdentifier()"
+                [disabled]="!(identifierObs | async)"
+            >remove</button>
+        </div>
+        <div class="mybtn full">
+            <button 
+                (click)="addIndentifier()" 
+                [disabled]="(identifierObs | async) || !(stringToTranslateObs | async)"
+            >ADD</button>
+        </div>
     </div>
 
 
@@ -66,65 +68,39 @@
     
     <div class="left-middle">
         <div></div>
-        <button 
-            class="mybtn" 
-            (click)="onClearButton()"
-            [disabled]="!(stringToTranslateObs | async)"
-        >unselect</button>
+        <div class="mybtn red">
+            <button 
+                (click)="onClearButton()"
+                [disabled]="!(stringToTranslateObs | async)"
+            >unselect</button>
+        </div>
     </div>
     
     <textarea 
-        [disabled]="!(identifierObs | async) || !(stringToTranslateObs | async) || (toChangeLanguageObs | async) === 'none'"
+        [disabled]="!(identifierObs|async) || !(stringToTranslateObs|async) || (toChangeLanguageObs|async) === 'none'"
         [(ngModel)]="translationArea">
     </textarea>
 
-    <button class="mybtn" (click)="onTranslate()" [disabled]="!translationArea">TRANSLATE</button>
-
-
-</div>
-
-
-
-
-
-
-<!-- 
-
-<div class="middle">
-
-    <textarea disabled >{{stringToTranslateObs | async}}</textarea>
-    
-    <div class="next-to-area">
+    <div class="mybtn full">
         <button 
-            class="mybtn" 
-            (click)="onClearButton()"
-            [disabled]="!(stringToTranslateObs | async)"
-        >unselect</button>
-        <button class="mybtn">cos</button>
-        <button class="mybtn"></button>
+            (click)="onTranslate()" 
+            [disabled]="!translationArea || !(toChangeLanguageObs | async)"
+        >ADD TRANSLATION</button>
     </div>
-    
-    <textarea 
-        [disabled]="!(identifierObs | async) || !(stringToTranslateObs | async) || (toChangeLanguageObs | async) === 'none'"
-        [(ngModel)]="translationArea">
-    </textarea>
-    
-    <div class="next-to-area">
-        <button 
-            class="mybtn" 
-            (click)="onTranslate()"
-            [disabled]="!translationArea"
-        >Translate</button>
-        <button class="mybtn"></button>
-        <button class="mybtn"></button>
+
+    <div class="cont left-bottom">
+        <div class="mybtn blue full">
+            <button>lorem ipsum</button>
+        </div>
+        <div class="mybtn blue full">
+            <button>ipsum</button>
+        </div>
+        <div class="mybtn blue full">
+            <button>dolor</button>
+        </div>
+        <div class="mybtn blue full">
+            <button (click)="autoIdentify()">auto identify</button>
+        </div>
     </div>
 
 </div>
-
-
-<div class="bottomm">
-    <button class="mybtn" (click)="generateTemplate()" [disabled]>GENERATE TEMPLATE</button>
-    <button class="mybtn" (click)="lolEvent.emit()">lol</button>
-    <button class="mybtn" (click)="scrollTop()">scroll up</button>
-</div>
- -->

@@ -45,8 +45,20 @@
               "value": "no-cache"
             }
           ]
+        },
+        {
+          "source": "**",
+          "headers": [ 
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            } 
+          ]
         }
       ],
+      "storage": {
+        "rules": "storage.rules"
+      },
       "rewrites": [
         {
           "source": "**",
@@ -54,5 +66,7 @@
         }
       ]
     }
+    
   ]
+  
 }

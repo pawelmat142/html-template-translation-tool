@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { Dialog, DialogButton } from '../models/dialog';
+import { Collection } from '../models/collection';
 import { LanguagesService } from './languages.service';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +16,19 @@ export class DialogService {
   purpose: string = ''
   languages: string[]
 
+  collections: Collection[]
+
   private dialog: Dialog = {
     open: false,
-    header: 'elo',
-    txt: ['siema'],
-    elements: [],
-    closeButtonInner: 'CLOSE',
+    header: 'initial',
+    txt: [],
   }
-  private dialogObs = new BehaviorSubject<Dialog>(this.dialog)
 
-  constructor(private language: LanguagesService) {
+  private dialogObs = new BehaviorSubject<any>(this.dialog)
+
+  constructor(
+    private language: LanguagesService,
+  ) {
     this.languages = this.language.list
   }
 
@@ -33,15 +38,15 @@ export class DialogService {
 
   open() { 
     this.dialog.open = true
-    this.go()
+    this.dialogObs.next(this.dialog)
   }
 
   close() { 
     this.dialog.open = false
-    this.go()
+    this.dialogObs.next(null)
   }
 
-  set header(h: String) { 
+  set header(h: string) { 
     this.dialog.header = h
   }
 
@@ -53,45 +58,35 @@ export class DialogService {
     }
   }
 
-  set closeButtonInner(t: string) {
-    this.dialog.closeButtonInner = t
-  }
-
-
-  set element(elAsText: string) {
-    if (elAsText === '') {
-      this.dialog.elements = []
-    } else { 
-      this.dialog.elements.push(elAsText)
-    }
-  }
-
-  
-  private go() { 
-    this.dialogObs.next(this.dialog)
-  }
 
 
   clearDialog() { 
+    this.purpose = ''
     this.dialog.header = ''
     this.dialog.txt = []
-    this.dialog.closeButtonInner = 'CLOSE'
-    this.dialog.elements = []
-    this.purpose = ''
+    this.dialog.confirmFunction = null
   }
 
 
-  chooseLanguageSet(): void {
-    this.purpose = 'language'
-    this.dialog = {
-      open: true,
-      header: 'Choose Language:',
-      txt: ['aaa', 'bbb', 'ccc'],
-      elements: null,
-      closeButtonInner: 'Close',
-      // okButtons: this.langs.list as string[]
-    }
+  setDialogWithConfirmButton(
+    header: string,
+    text: string,
+    confirmFunction: Function,
+  ) { 
+    this.clearDialog()
+    this.dialog.header = header
+    if (text) this.dialog.txt.push(text)
+    this.dialog.confirmFunction = confirmFunction
+    this.open()
   }
+
+
+  setDialogOnlyHeader(header: string) {
+    this.clearDialog()
+    this.dialog.header = header
+    this.open()
+  }
+
 
   
 }

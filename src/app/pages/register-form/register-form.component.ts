@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { CustomValidators } from 'src/app/providers/validators';
 import { Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 
@@ -37,8 +36,7 @@ export class RegisterFormComponent implements OnInit {
   errorMsg = ''
   message = ''
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   async onSubmit() {
     try {
@@ -63,7 +61,7 @@ export class RegisterFormComponent implements OnInit {
       
     } catch (error) {
       this.errorMsg = 'Registration failed'
-      setTimeout(() => this.errorMsg = '', 2000)
+      setTimeout(() => this.errorMsg = '', 10000)
     }
   }
 

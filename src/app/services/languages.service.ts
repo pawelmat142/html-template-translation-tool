@@ -53,8 +53,8 @@ export class LanguagesService {
   ]
 
   private initial: Language = {
-    name: 'none',
-    origin: 'none',
+    name: '',
+    origin: '',
     code: 'nn'
   }
 
@@ -90,7 +90,8 @@ export class LanguagesService {
   }
 
 
-  setOriginLanguage(txt: string): void {
+  setOriginLanguage(_txt: string): void {
+    let txt = _txt.toString()
     let position = txt.search('lang="')
     if (position) { 
       let langCode = txt.substr(position + 6, 2)
@@ -126,8 +127,8 @@ export class LanguagesService {
   set toChange(name: string) { 
     if (this.list.includes(name)) {
       const lang = this.langs.find(l => l.name === name) as Language
-      this.toChangeObs.next(lang)
       this._toChange = lang
+      this.toChangeObs.next(lang)
     } else throw new Error('no such language')
   }
 
