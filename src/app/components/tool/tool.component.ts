@@ -67,6 +67,7 @@ export class ToolComponent implements OnInit {
     // triggered by onActiveElement() - template component
     if (!change.originTexts.firstChange) {
       let newOriginTexts = change['originTexts'].currentValue
+      console.log(newOriginTexts)
       this.translations = newOriginTexts.map(el => '')
       if (this.translateToTexts && this.translateToTexts.length) { 
         this.translations = this.translateToTexts
@@ -83,10 +84,7 @@ export class ToolComponent implements OnInit {
   async onAddTranslation() {
     let translations: string[] = this.translationAreaRefs
       .map(t => t.nativeElement.innerText.replace(/\n/g, ''))
-    // *********************************
-    let origins = this.template.activeTranslationElement[this.language.origin]
     translations = this.fillSpacesIfNeeds(translations)
-    console.log(origins)
     console.log(translations)
     try {
       let filled = translations.every(t => !!t)

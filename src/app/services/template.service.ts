@@ -121,10 +121,10 @@ export class TemplateService {
 
   identifyTextNode(node: Node): void {
     let nodeAsText = node as Text
-    let txtToTranslate = nodeAsText.textContent.replace(/\s/g, '').replace(/\n/g, '')
-    if (txtToTranslate) { 
+    let str = nodeAsText.textContent.replace(/\s/g, '').replace(/\n/g, '')
+    if (str) { 
       // let txtToTranslate = nodeAsText.data.replace(/\n/g, '').trim()
-      // let txtToTranslate = nodeAsText.data.replace(/\n/g, '')
+      let txtToTranslate = nodeAsText.data.replace(/\n/g, '')
       let parentElement = node.parentElement
       let identifier = parentElement.getAttribute('identifier')
       if (identifier) {
