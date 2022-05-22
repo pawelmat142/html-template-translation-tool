@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { ProjectService } from './services/project.service';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,14 @@ export class AppComponent  {
 
   title = 'html-translator';
 
-  constructor(private router: Router) { 
+  reportActive: boolean = false
+
+  constructor(private router: Router, private project: ProjectService) { 
+
+    this.project.openReportObs.subscribe(() => {
+      console.log('open report observer')
+      this.reportActive = true
+    })
 
     if (this.isMobile()) {
       this.router.navigate(['go-to-desktop'])

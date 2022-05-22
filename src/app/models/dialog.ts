@@ -4,8 +4,3 @@ export interface Dialog {
   txt: string[],
   confirmFunction?: Function,
 }
-
-export interface DialogButton { 
-  inner: String,
-  action: String,
-}

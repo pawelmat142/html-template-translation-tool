@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore'
 import { LanguagesService } from './languages.service';
-import { Observable, map, catchError, tap } from 'rxjs';
+import { Observable, map, catchError } from 'rxjs';
 import { Collection } from '../models/collection';
 import { Router } from '@angular/router';
-import { deleteField } from "firebase/firestore";
+import { deleteField, doc } from "firebase/firestore";
 import { DialogService } from './dialog.service';
 import { getStorage, ref, uploadBytes, deleteObject, getBlob } from "firebase/storage"
+import { TranslationElement } from '../models/translationElement';
 
 
 // FIRESTORE INTERFACE
@@ -16,61 +17,151 @@ import { getStorage, ref, uploadBytes, deleteObject, getBlob } from "firebase/st
 })
 export class DataService {
 
+  constructor(
+    private firestore: AngularFirestore,
+    private language: LanguagesService,
+    private router: Router,
+    private dialog: DialogService,
+  ) { }
+  
   get uid(): string {
     let uid = localStorage.getItem('uid')
     if (!uid) this.router.navigate(['login'])
     return uid
   }
 
-  constructor(
-    private firestore: AngularFirestore,
-    private language: LanguagesService,
-    private router: Router,
-    private dialog: DialogService,
-  ) {
-
-  }
+  get newId(): string { return this.firestore.createId() }
+  
 
   // PROJECTS
 
   getUserProjectsObs(): Observable<Collection[]> {
     return this.firestore
-      .collection(`appProjects`)
-      .doc(this.uid)
+      .collection(this.uid)
       .valueChanges()
       .pipe(
-        map(this.parseToCollectionArr),
+        map(this.parseToProjectsArr),
         catchError(error => this.handeError(error))
       ) as Observable<Collection[]>
   }
 
-  async addProject(data: Collection, file: File) { 
-    try { 
-      await this.uploadFile(file)
-      await this.firestore
-        .collection('appProjects')
-        .doc(this.uid)
-        .update({ [data.name]: data })
-      
-      return true
-      
-    } catch (error) { 
-      console.log(error)
-      return false
-    }
+  async addProject(project: Collection) { 
+    return await this.firestore
+      .collection(this.uid)
+      .doc(project.name)
+      .set(project)
   }
 
-  async deleteProject(name: string, filename: string) { 
-    await this.askIfSure()
-    await this.deleteFile(filename)
-    await this.firestore
-      .collection('appProjects')
-      .doc(this.uid)
-      .update({ [name]: deleteField() })
+  async updateProject(project: Collection) { 
+    return await this.firestore
+      .collection(this.uid)
+      .doc(project.name)
+      .update(project)
+  }
+
+  async removeUserProject(name: string) { 
+    const translations = this.firestore.firestore
+      .collection(this.uid)
+      .doc(name)
+      .collection('translations')
+    await this.clearCollection(translations)
+    return await this.firestore
+      .collection(this.uid)
+      .doc(name)
+      .delete()
+  }
+
+  // async getProject(projectName: string) { 
+  //   return await this.firestore
+  //     .collection(this.uid)
+  //     .doc(projectName)
+  //     .ref.get()
+  // }
+
+  // IDENTIFIERS
+
+  async addTranslationDocs(projectName: string, language: string, translationElements: TranslationElement[]) {
+    let batch = this.firestore.firestore.batch()
+    translationElements.forEach(el => { 
+      let docRef = this.firestore
+        .collection(this.uid)
+        .doc(projectName)
+        .collection('translations')
+        .doc(el.identifier).ref
+      batch.set(docRef, el)
+    })
+    await batch.commit()
   }
 
 
-  // FILE STORAGE
+  async updateTranslationDocs(projectName: string, translationElements: TranslationElement[]) {
+    let batch = this.firestore.firestore.batch()
+    translationElements.forEach(el => { 
+      let docRef = this.firestore
+        .collection(this.uid)
+        .doc(projectName)
+        .collection('translations')
+        .doc(el.identifier).ref
+      batch.update(docRef, el)
+    })
+    await batch.commit()
+  }
+
+  async getProjectTranslationDocs(projectName: string) { 
+    let result: TranslationElement[] = []
+    let snapshot = await this.firestore
+      .collection(this.uid)
+      .doc(projectName)
+      .collection('translations')
+      .ref.get()
+    snapshot.forEach(el => result
+      .push(el.data() as TranslationElement))
+    return result
+  }
+
+  async deleteTranslationDoc(projectName: string, identifier: string) { 
+    return await this.firestore
+      .collection(this.uid)
+      .doc(projectName)
+      .collection('translations')
+      .doc(identifier)
+      .delete()
+  }
+
+  async deleteTranslationDocuments(projectName: string, identifiers: string[]) { 
+    let batch = this.firestore.firestore.batch()
+    identifiers.forEach(identifier => { 
+      let docRef = this.firestore
+        .collection(this.uid)
+        .doc(projectName)
+        .collection('translations')
+        .doc(identifier).ref
+      batch.delete(docRef)
+    })
+    return await batch.commit()
+  }
+
+
+  // TRANSLATIONS
+
+  async updateTranslationDoc(
+    projectName: string,
+    identifier: string,
+    translateToLanguage: string,
+    texts: string[]
+  ) { 
+    return await this.firestore
+      .collection(this.uid)
+      .doc(projectName)
+      .collection('translations')
+      .doc(identifier)
+      .update({[translateToLanguage]: texts})
+  }
+
+
+
+  // FILE STORAGE - templates
+
   async uploadFile(file: File) { 
     const storage = getStorage()
     const fileRef = ref(storage, `${this.uid}/${file.name}`)
@@ -100,95 +191,17 @@ export class DataService {
     }
   }
 
-  // IDENTIFIERS
-
-  async getDocByIdentifier(identifier: string, projectName: string) {
-    try { 
-      let data = await this.firestore
-        .collection(`/${projectName}`)
-        .doc(identifier)
-        .ref.get()
-      
-      if (data.exists) {
-        let result = data.data() as any
-        result.identifier = identifier
-        return result
-      } else throw new Error('doc doesnt exists')
-
-    } catch (error) {
-      console.log(error)
-      return false
-    }
-  }
-  
-  async addElementIdentifier(originText: string, projectName: string) {
-    try {
-      
-      let identifier = this.firestore.createId()
-      let data = { [this.language.origin]: originText }
-      
-      let result = await this.firestore
-        .collection(`/${projectName}`)
-        .doc(identifier)
-        .set(data)
-      
-      console.log(result)
-      
-      return identifier as string
-
-    } catch (error) { 
-      console.log(error)
-      return false
-    }
-  }
-
-
-  async removeIdentifier(projectName: string, identifier: string) {
-    try {
-      await this.firestore
-        .collection(projectName)
-        .doc(identifier)
-        .delete()
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
-    }
-  }
-
-
 
   // OTHERS
-
-  askIfSure() {
-    return new Promise(resolve => {
-      this.dialog.setDialogWithConfirmButton(
-        'Warning!',
-        'Are you sure you want to delete this project?',
-        resolve,
-      )
+  async clearCollection(ref) {
+    return await ref.onSnapshot((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        ref.doc(doc.id).delete()
+      })
     })
   }
 
-  async addTranslation(
-    identifier: string,
-    language: string,
-    text: string,
-    projectName: string
-  ) {
-    try { 
-      this.firestore
-        .collection(`/${projectName}`)
-        .doc(identifier)
-        .update({[language]: text})
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
-    }
-  }
-
-  private parseToCollectionArr(input: any): Collection[] {
+  private parseToProjectsArr(input: any): Collection[] {
     let result: Collection[] = []
     if (input) {
       for (let r in input) {

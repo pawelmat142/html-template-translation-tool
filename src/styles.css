@@ -16,11 +16,11 @@
     /* blue highlight off */
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;
+    /* -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    user-select: none;
+    user-select: none; */
     /* font */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -119,6 +119,11 @@ form .card p {
     font-weight: normal;
 }
 
+select {
+    height: 40px;
+}
+
+select,
 .myinput,
 input {
     letter-spacing: .5px;
@@ -129,7 +134,7 @@ input {
     background-color: #e8eaed;
     outline: none !important;
     border: 0;
-    color: #676b70;
+    color: #263f5f;
 }
 
 .form.one button {

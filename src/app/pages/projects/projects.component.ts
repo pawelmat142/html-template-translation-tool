@@ -1,110 +1,95 @@
-import { Component, OnInit } from '@angular/core';
-import { ProjectService } from 'src/app/services/project.service';
-import { Observable, map, BehaviorSubject} from 'rxjs';
-import { Collection } from '../../models/collection';
-import { ReadFileService } from 'src/app/services/read-file.service';
+import { Component, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { DataService } from 'src/app/services/data.service';
+import { ProjectService } from 'src/app/services/project.service';
 import { DialogService } from 'src/app/services/dialog.service';
-import { Router } from '@angular/router';
+import { Collection } from '../../models/collection';
+import { LanguagesService } from 'src/app/services/languages.service';
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
-export class ProjectsComponent implements OnInit {
+export class ProjectsComponent {
 
-  collections: Collection[]
   filenameAdding: string = ''
   fileForNewProject: File
+  languages: string[]
+
+  userProjectsObs: Observable<Collection[]>
 
   constructor(
     private auth: AuthenticationService,
     private service: ProjectService,
-    private readFile: ReadFileService,
     private db: DataService,
     private dialog: DialogService,
-    private router: Router
+    private router: Router,
+    private language: LanguagesService,
   ) { 
-
-    this.db.getUserProjectsObs().subscribe(
-      result => this.collections = result)
-
+    
+    this.languages = this.language.list
+    this.userProjectsObs = this.db.getUserProjectsObs()
   }
 
   inputOpen: boolean = false
   input: string = ''
+  @ViewChild('languageRef') languageRef
 
-  ngOnInit(): void { }
 
-
-  onFileSelected(event: any) {
-    this.fileForNewProject = event.target.files[0] as File
-    try {
-      if (!this.htmlFile(this.fileForNewProject)) throw new Error('file has to be html')
-
-      let isFilenameTaken = this.collections
-        .find(el => el.filename === this.fileForNewProject.name)
-      if (isFilenameTaken) throw new Error('file name is already taken')
-
-      this.filenameAdding = this.fileForNewProject.name
+  async onFileSelected(event: any) {
+    let file = event.target.files[0] as File
+    try { 
+      if (this.service.filenameTaken(file)) throw new Error('file name is taken!')
+      if (!this.htmlFile(file)) throw new Error('file has to be HTML!')
+      if (!(await this.service.hasBodySlicers(file)))
+        throw new Error('file has to contain 2x <!-- bodyslicer -->')
+      this.filenameAdding = file.name
       this.inputOpen = true
-
-    } catch (error) { 
-      this.fileForNewProject = null
-      this.dialog.setDialogOnlyHeader(error.message)
-    }
+      this.service.fileForNewProject = file
+    } catch (error) {this.dialog.setDialogOnlyHeader(error.message)}
   }
-  
+
   rejectAddingProject() {
     this.filenameAdding = ''
-    this.fileForNewProject = null
+    this.service.fileForNewProject = null
     this.inputOpen = false
   }
 
   async onAddNewProject() {
-    let isNameTaken = this.collections.find(el => el.name === this.input)
-    if (isNameTaken) {
-      this.dialog.setDialogOnlyHeader('Project name is already taken!')
-    } else { 
-      
+    try {
+      if (this.service.projectNameTaken(this.input))
+        throw new Error('project name is taken!')
       let newCollection: Collection = {
         name: this.input,
         filename: this.filenameAdding,
         modified: new Date().toLocaleDateString() +
-          ' ' + new Date().toLocaleTimeString()
+          ' ' + new Date().toLocaleTimeString(),
+        originLanguage: this.languageRef.nativeElement.value
       }
-
-      let result = await this.db
-        .addProject(newCollection, this.fileForNewProject)
-      
-      if (result) { 
-        console.log(result)
-        this.inputOpen = false
-      }
-    }
+      let result = await this.service.addProject(newCollection)
+      if (!result) throw new Error('add project error')
+      this.rejectAddingProject()
+    } catch (error) {this.dialog.setDialogOnlyHeader(error.message)}
   }
 
   onDelete(project: Collection): void {
-    this.db.deleteProject(project.name, project.filename)
+    this.service.deleteProject(project.name)
   }
-
 
   async onSetProject(project: Collection) {
     let file = await this.db.downloadFile(project.filename)
-    // let txt = await file.text()
-    // console.log(txt)
     this.service.file = file
     this.service.project = project
+    this.language.setOriginLanguage(project.originLanguage)
     this.router.navigate(['main'])
   }
     
-
   logout(): void {
     this.auth.logout()
   }
-
 
   private htmlFile(file: File): boolean {
     if (file.name.split('.').pop() === 'html') {

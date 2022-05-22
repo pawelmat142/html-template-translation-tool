@@ -1,19 +1,19 @@
 
 <app-tool 
-    (translatedEvent)="setBorderToTranslatedElement()"
+    [identifier]="identifier"
+    [originTexts]="originTexts"
+    [translateToTexts]="translateToTexts"
+    (autoIdentifyEvent)="autoIdentify()"
+    (saveTemplateEvent)="saveTemplate()"
+    (unselectEvent)="unselect()"
+    (removeIdentifierEvent)="removeIdentifier()"
+    (generateEvent)="generateTemplate()"
+    (translateTemplateEvent)="translateTemplate()"
 ></app-tool>
 
 <div 
     class="content"
-    (mousemove)="onMousemove($event)"
+    (mousemove)="onMousemove($event.target)"
     [innerHTML]="templateTxt"
     #contentReference
 ></div>
-<!-- 
-<div class="no-content" *ngIf="!(contentObs | async)">
-    <h1>Load HTML File</h1>
-    <p>warning! do not load untrusted files!</p>
-    <p>code sanitazing is turned off</p>
-</div> -->
-
-

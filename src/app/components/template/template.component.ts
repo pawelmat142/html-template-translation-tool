@@ -1,9 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TemplateService } from 'src/app/services/template.service';
-import { Observable } from 'rxjs';
 import { LanguagesService } from 'src/app/services/languages.service';
-import { DataService } from 'src/app/services/data.service';
 import { ProjectService } from 'src/app/services/project.service';
+import { TranslationElement } from 'src/app/models/translationElement';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ToolComponent } from '../tool/tool.component';
 
 
 // DISPLAY AND MODIFY LOADED TEMPLATE
@@ -13,80 +14,90 @@ import { ProjectService } from 'src/app/services/project.service';
   templateUrl: './template.component.html',
   styleUrls: ['./template.component.css']
 })
-export class TemplateComponent {
+export class TemplateComponent implements OnInit, OnDestroy{
 
-  contentObs: Observable<string>
-  content: string
+  @ViewChild(ToolComponent) tools: ToolComponent
+
+  // tool component binding
+  identifier: string
+  originTexts: string[]
+  translateToTexts: string[]
+
+  templateTxt: any
+
+  @ViewChild('contentReference')
+  private contentRef: ElementRef
 
   private selectedElement: HTMLElement
   private activeElement: HTMLElement
 
-  // lista dokumentow reprezentujaca elementy wczytanego HTMLa z nadanym identifier
-  // zaciagana z db w trakcie wczytywania pliku
-  identifiedElements: any[] = []
-
-  templateTxt: string
-
-  @ViewChild('contentReference') contentRef
-
   constructor(
     private template: TemplateService,
     private language: LanguagesService,
-    private db: DataService,
-    private project: ProjectService
+    private project: ProjectService,
+    private domSanitizer: DomSanitizer,
   ) {
-    this.project.getFileTxtInitialObs().subscribe(
-      txt => this.initializeTemplate(txt))
-
-    this.template.getIdentifierObs().subscribe(data => { 
-      if (data) this.setBorderToElementWithIdentifier()
-      else this.removeBorder()
-    })
-    this.template.getActiveElementObs().subscribe(e => this.onActiveElement(e))
-    this.language.getToChangeObs().subscribe(l => l.name && this.inititializeBorders())
-  }
-
-  private innerBefore = ''
-  private blue = '#41a4a6'
-  private green = '#63aa55'
-  private orange = '#db863b'
+    this.project.getTemplateObs().subscribe(
+      body => this.initializeTemplate(body))
   
-  private initializeTemplate(txt: string): void {
-    this.templateTxt = txt
-    setTimeout(async () => { 
-    // ustawia dokumenty do templateIdentifiedElements - reprezentuja elementy 
-      let elementsWithIdentifier = this.contentRef.nativeElement.querySelectorAll('[identifier]')
-      let identifiers: string[] = this.getIdentifiersFromNodeList(elementsWithIdentifier)
-      this.identifiedElements = await this.getDocsWithIdentifier(identifiers)
-    // oznacza elementy z nadanym identifier i te przetlumaczone juz do danego jezyka
-      this.inititializeBorders()
-    }, 3000)
+    this.language.getTranslateToObs()
+      .subscribe(l => l.name && this.template.inititializeBorders())
   }
+  
+  ngOnInit() {
+    this.project.initTemplateObs()
+    this.template.removeIdentifiersToRemove()
+  }
+  
+  ngOnDestroy() {}
 
+  // TEMPLATE INITIALIZATION 
+
+  private async initializeTemplate(fileAsTxt: string) {
+    this.templateTxt =  this.domSanitizer.bypassSecurityTrustHtml(fileAsTxt)
+    await this.template.getTranslationElements()
+    this.template.inititializeBorders()
+  }
 
   // MOUSE EVENT ACTIONS
 
-  onMousemove(event: Event) {
-    let element = event.target as HTMLElement;
+  private innerBefore = ''
+
+  onMousemove(target: EventTarget) {
+    let element = target as HTMLElement
     if (element.innerHTML !== this.innerBefore) { 
-      this.innerBefore = element.innerHTML
-      this.checkElement(element)
+      let identifier = element.getAttribute('identifier')
+      if (identifier) { 
+        this.innerBefore = element.innerHTML
+        this.checkElement(element)
+      }
     }
   }
-
+  
   private checkElement(element: HTMLElement): void {
-    if (element.childNodes.length === 1 &&
-      element.childNodes[0].nodeType === Node.TEXT_NODE
-    ) {
-      this.selectElement(element)
+    let childNodes = element.childNodes
+    if (childNodes.length > 0) {
+      for (let i = 0; i < childNodes.length; i++) { 
+        if (childNodes[i].nodeType === Node.TEXT_NODE) {
+          this.selectElement(childNodes[i].parentElement)
+          break
+        } else if (
+          childNodes[i] instanceof HTMLInputElement ||
+          childNodes[i] instanceof HTMLTextAreaElement
+        ) {
+          this.selectElement(childNodes[i] as HTMLElement)
+          break
+        } else this.checkElement(childNodes[i] as HTMLElement)
+      }
     }
   }
 
   private selectElement(element: HTMLElement): void {
     if (!this.activeElement) {
+      this.removeStyles(this.selectedElement)
+      this.removeListeners(this.selectedElement)
       this.selectedElement = element
       this.setSelectStyles(element)
-      
       element.onmouseleave = () => this.onElementLeave(element)
       element.onclick = ($event: Event) => {
         $event.preventDefault()
@@ -96,33 +107,58 @@ export class TemplateComponent {
   }
 
   private onElementLeave(element: HTMLElement): void {
-    if (this.selectedElement) { 
-      this.removeStyles(element)
+    if (this.selectedElement) {
       this.selectedElement = null
+      this.innerBefore = ''
+      this.removeStyles(element)
+      this.removeListeners(element)
     }
   }
   
   private clickElement(element: HTMLElement): void {
-    if (this.selectedElement) {
-      this.template.activeElement = element
-    } else if (this.activeElement) {
-      this.template.activeElement = null
-    }
+    if (this.activeElement) this.deactivate()
+    else if (this.selectedElement) this.activate(element)
   }
   
-  private onActiveElement(element: HTMLElement): void {
+  activate(element?: HTMLElement): void {
     if (element) {
       this.activeElement = element
-      this.setActiveStyles(element)
       this.selectedElement = null
-      this.setTranslationIfExist()
-    } else { 
-      this.removeStyles(this.activeElement)
-      this.activeElement = null
-      this.template.translation = ''
+      this.setActiveStyles(element)
+      let identifier = element.getAttribute('identifier')
+      if (identifier) {
+        this.identifier = identifier
+        this.template.setActiveTranslationElement(identifier)
+        let originLanguage = this.language.origin
+        if (this.template.activeTranslationElement.hasOwnProperty(originLanguage)) {
+          this.originTexts = this.template.activeTranslationElement[originLanguage]
+        }
+        let translateTo = this.language.translateTo
+        if (this.template.activeTranslationElement.hasOwnProperty(translateTo)) {
+          this.translateToTexts = this.template.activeTranslationElement[translateTo]
+        } 
+      }
     }
   }
+
+  deactivate(_element?: HTMLElement) {
+    let element = _element ? _element : this.activeElement
+    this.removeStyles(element)
+    this.removeListeners(element)
+    this.activeElement = null
+    this.selectedElement = null
+    this.identifier = ''
+    this.originTexts = []
+    this.translateToTexts = []
+    this.innerBefore = ''
+  }
   
+  private removeListeners(element: HTMLElement) { 
+    if (element) { 
+      let newElement = element.cloneNode(true)
+      element.parentNode?.replaceChild(newElement, element)
+    }
+  }
 
   // STYLING
 
@@ -130,15 +166,13 @@ export class TemplateComponent {
     if (this.selectedElement) { 
       element.style.backgroundColor = '#41a4a6'
       element.style.cursor = 'pointer'
-      element.style.padding = '.5em .2em'
     }
   }
-
+  
   private setActiveStyles(element: HTMLElement): void {
     if (this.activeElement) { 
       element.style.backgroundColor = '#db863b'
       element.style.cursor = 'pointer'
-      element.style.padding = '.5em .2em'
     } 
   }
 
@@ -146,32 +180,50 @@ export class TemplateComponent {
     if (element) { 
       element.style.backgroundColor = ''
       element.style.cursor = ''
-      element.style.padding = ''
     }
   }
 
-  private removeBorder(): void {
-    if (this.activeElement) {
-      this.activeElement.style.border = ''
-    }
+  
+  // FROM TOOL COMPONENT
+
+  removeIdentifier() { 
+    this.template.removeElementIdentifier(this.activeElement)
   }
 
-  private setBorderToElementWithIdentifier(_element?): void {
-    let element = _element || this.activeElement
-    if (element) {
-      element.style.border = '2px solid ' + this.blue
-    }
+  async saveTemplate() {
+    this.contentRef.nativeElement.querySelectorAll('[style]')
+      .forEach(el => el.removeAttribute('style'))
+    let contentBodyAfterIdentify = this.getContentBody()
+    this.template.saveTemplate(contentBodyAfterIdentify)
   }
 
-  setBorderToTranslatedElement(_element?): void {
-    let element = _element || this.activeElement
-    if (element && element.hasAttribute('identifier')) {
-      element.style.border = '2px solid ' + this.orange
-    }
+  async autoIdentify() {
+    let content = this.contentRef.nativeElement as Node
+    this.template.identifyElementLoop(content)
   }
 
+  unselect(): void {
+    this.deactivate(this.activeElement)
+  }
 
-  // INITIALIZATION
+  generateTemplate() {
+    this.contentRef.nativeElement.querySelectorAll('[style]')
+      .forEach(el => el.removeAttribute('style'))
+    let newContent = this.getContentBody()
+    this.template.generateTemplate(newContent)
+  }
+  
+  translateTemplate() { 
+    let newContent = this.getContentBody()
+    this.template.translateTemplate(newContent)
+  }
+  
+  
+  // OTHERS
+
+  getTranslationElement(identifier: string): TranslationElement { 
+    return this.template.translationElements.find(e => e.identifier === identifier)
+  }
 
   private getIdentifiersFromNodeList(elements: NodeList): string[] {
     let result: string[] = []
@@ -182,33 +234,19 @@ export class TemplateComponent {
     return result
   }
 
-  private async getDocsWithIdentifier(identifiers) {
-    let promises = identifiers.map(identifier => 
-      this.db.getDocByIdentifier(identifier, this.project.name))
-    return await Promise.all(promises)
-  }
-
-  private inititializeBorders() {
-    if (this.identifiedElements.length) { 
-      this.identifiedElements.forEach(doc => { 
-        let element = document.querySelector(`[identifier="${doc.identifier}"]`)
-        if (doc.hasOwnProperty(this.language.toChange)) { 
-          this.setBorderToTranslatedElement(element)
-        } else {
-          this.setBorderToElementWithIdentifier(element)
-        }
-      })
-    }
-  }
-
   private setTranslationIfExist(): void {
     let identifeir = this.activeElement.getAttribute('identifier')
     if (identifeir) {
-      let doc = this.identifiedElements.find(el => el.identifier === identifeir)
-      if (doc && doc.hasOwnProperty(this.language.toChange)) {
-        this.template.translation = doc[this.language.toChange]
+      let element = this.template.translationElements
+        .find(el => el.identifier === identifeir)
+      if (element && element.hasOwnProperty(this.language.translateTo)) {
+        this.template.translation = element[this.language.translateTo]
       }
     }
   }
 
+  private getContentBody() { 
+    return this.contentRef.nativeElement.innerHTML
+      .split('<!-- bodyslicer -->')[1]
+  }
 }

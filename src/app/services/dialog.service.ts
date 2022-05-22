@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { Dialog, DialogButton } from '../models/dialog';
+import { Dialog } from '../models/dialog';
 import { Collection } from '../models/collection';
 import { LanguagesService } from './languages.service';
 import { DataService } from './data.service';
@@ -10,13 +10,10 @@ import { DataService } from './data.service';
 })
 export class DialogService {
 
-
   // DIALOG MODAL WINDOW MANIPULATION
 
   purpose: string = ''
   languages: string[]
-
-  collections: Collection[]
 
   private dialog: Dialog = {
     open: false,
@@ -26,9 +23,7 @@ export class DialogService {
 
   private dialogObs = new BehaviorSubject<any>(this.dialog)
 
-  constructor(
-    private language: LanguagesService,
-  ) {
+  constructor(private language: LanguagesService) {
     this.languages = this.language.list
   }
 
@@ -58,15 +53,12 @@ export class DialogService {
     }
   }
 
-
-
   clearDialog() { 
     this.purpose = ''
     this.dialog.header = ''
     this.dialog.txt = []
     this.dialog.confirmFunction = null
   }
-
 
   setDialogWithConfirmButton(
     header: string,
@@ -86,8 +78,6 @@ export class DialogService {
     this.dialog.header = header
     this.open()
   }
-
-
   
 }
 

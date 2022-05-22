@@ -8,13 +8,15 @@
         <div class="myrow head">
             <p>PROJECT:</p>
             <p>FILENAME:</p>
+            <p>ORIGIN LANGUAGE:</p>
             <p>MODIFIED:</p>
             <p>TIME:</p>
         </div>
 
-        <div class="myrow" *ngFor="let project of collections">
+        <div class="myrow" *ngFor="let project of userProjectsObs | async">
             <p>{{project.name}}</p>
             <p>{{project.filename}}</p>
+            <p>{{project.originLanguage}}</p>
             <p>{{project.modified.split(' ').shift()}}</p>
             <p>{{project.modified.split(' ').pop()}}</p>
             <div class="mybtn center">
@@ -38,6 +40,13 @@
         <div>
             <label>project name:</label>
             <input type="text" placeholder="set project name..." [(ngModel)]="input">
+        </div>
+        <div>
+            <label>origin language:</label>
+            <select #languageRef>
+                <option disabled>Select Language</option>
+                <option *ngFor="let l of languages" value="{{l}}">{{l}}</option>
+            </select>
         </div>
         <div class="mybtn center">
             <button (click)="onAddNewProject()" [disabled]="!input">ADD PROJECT</button>

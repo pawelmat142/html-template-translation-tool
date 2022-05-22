@@ -1,0 +1,81 @@
+.mycontainer {
+    margin: 10vh auto 10vh;
+    max-width: 95vw;
+}
+
+.explanation {
+    font-size: 1.3em;
+    max-width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #1a73e8;
+}
+
+h4 {
+    text-align: center;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.elements {
+    margin-top: 20px;
+    border: 1px solid #0000001f;
+    border-radius: 6px;
+    box-shadow: 0 -1px 0 rgb(0 0 0 / 12%) inset;
+    margin-bottom: 20px;
+}
+
+.elements .myrow {
+    display: grid;
+    grid-template-columns: 2fr 5fr 5fr 2fr 2fr;
+    align-items: center;
+    height: 45px;
+}
+
+.elements .myrow input {
+    margin: 3px 0;
+    text-align: left;
+}
+
+.elements .myrow.head {
+    font-weight: bold;
+}
+
+.elements .myrow button {
+    width: 100%;
+    margin: 0 10px;
+}
+
+.elements .myrow > * {
+    text-align: center;
+}
+
+.elements .group:nth-child(even) {
+    background-color: #e8e8e8;
+}
+
+.mycontainer > .mybtn {
+    margin-top: 20px;
+}
+
+.mycontainer > .mybtn button {
+    min-width: 200px;
+}
+
+.languages > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.languages > div > p:not(:first-child) {
+    font-weight: bold;
+}

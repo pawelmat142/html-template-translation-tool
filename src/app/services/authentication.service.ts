@@ -4,7 +4,6 @@ import { AngularFirestore } from '@angular/fire/compat/firestore'
 import { GoogleAuthProvider, GithubAuthProvider, User } from '@angular/fire/auth'
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +44,6 @@ export class AuthenticationService {
     return this.user.uid
   }
 
-
   async login(email: string, password: string) { 
     try {
       let result = await this.fireauth
@@ -58,22 +56,20 @@ export class AuthenticationService {
     } catch (error) { return error }
   }
 
-
   async register(email: string, password: string) { 
     try { 
       let result = await this.fireauth
         .createUserWithEmailAndPassword(email, password)
         
-      let r = await this.firestore
-        .collection(`/appProjects`)
-        .doc(result.user.uid)
-        .set({})
+      // let r = await this.firestore
+      //   .collection(result.user.uid)
+      //   .doc()
+      //   .set({})
       
       this.router.navigate(['login'])
       return true
     } catch (error) { return error }
   }
-
 
   async logout() { 
     try {
@@ -86,22 +82,6 @@ export class AuthenticationService {
       return false
     }
   }
-
-
-
-  async forgotPassword(email: string) {
-    try { 
-      let result = await this.fireauth
-        .sendPasswordResetEmail(email)
-      this.router.navigate(['varify-email'])
-      return true
-      
-    } catch (error) {
-      return false
-    }
-  }
-
-
 
 
   async googleLogin() { 

@@ -1,6 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { TemplateComponent } from 'src/app/components/template/template.component';
-import { ToolComponent } from 'src/app/components/tool/tool.component';
+import { Component } from '@angular/core';
 
 // MAIN VIEW AFTER AUTHORIZATION - CONTAINS TEMPLATE AND TOOLS
 
@@ -9,7 +7,8 @@ import { ToolComponent } from 'src/app/components/tool/tool.component';
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.css']
 })
-export class MainComponent implements OnInit {
+export class MainComponent {
   constructor() { }
-  ngOnInit(): void {}
+  
+  
 }

@@ -11,20 +11,41 @@
 }
 
 .bottom {
-    height: 50px;
+    height: 115px;
     width: 100%;
     z-index: 100;
     position: fixed;
     bottom: 0;
     left: 0;
-    padding: 0 0.5em;
+    transition: .1s ease-in-out;
+    transform: translateY(65px);
+}
+
+:host(.hover) .bottom {
+    transform: translateY(0);
+}
+
+.bottom .hidden-row {
+    width: 100%;
+    height: 50%;
+    background-color: var(--darker);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+}
+
+.bottom .hidden-row > div {
+    display: flex;
+    align-items: center;
+    gap: 1em;
 }
 
 .bottom .myrow {
     display: grid;
     grid-template-columns: 3fr 3fr 6fr 3fr;
     column-gap: 1em;
-    height: 100%;
+    height: 50px;
 }
 
 .myrow > div { 
@@ -93,7 +114,7 @@
 .left { 
     position: relative;
     height: 100%;
-    padding: 0 1em;
+    padding: 0 .3em;
     color: #000;
     display: flex;
     flex-direction: column;
@@ -102,34 +123,66 @@
     padding-bottom: 6vh;
 }
 
-.left-middle {
-    display: flex;
-    justify-content: space-between;
-}
-
 .left .identifier {
     display: grid;
     grid-template-columns: 1fr 3fr;
-    column-gap: 1em;
+    column-gap: .5em;
     row-gap: .3em;
 }
 
-textarea {
-    width: 25vw;
-    min-width: 400px;
-    min-height: 150px;
-    background-color: var(--morelighter);
-    border: 0;
-    outline: none !important;
-    height: 20vh;
-    font-size: 1.2em;
-    border-radius: 0.2em;
-    color: #fff;
-    padding: 0.5em 0.7em;
-    letter-spacing: .5px;
+.areas {
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+    overflow: auto;
+    margin-top: 8vh;
 }
 
-textarea[disabled] {
+.areas::-webkit-scrollbar {
+    width: 8px;               /* width of the entire scrollbar */
+    border-radius: 4px;
+}
+
+.areas::-webkit-scrollbar-track {
+    background: transparent;        /* color of the tracking area */
+}
+
+.areas::-webkit-scrollbar-thumb {
+    background-color: var(--morelighter);    /* color of the scroll thumb */
+    border-radius: 5px;       /* roundness of the scroll thumb */
+    border: 1px solid transparent;  /* creates padding around scroll thumb */
+}
+
+.areas .origin {
+    margin-top: 15px;
+    background-color: var(--lighter);
+}
+
+.textarea-wrapper {
+    display: inline-table;
+}
+
+.textarea {
+    user-select: auto;
+    margin-top: 3px;
+    min-height: 5vh;
+    max-width: 30vw;
+    width: 100%;
+    background-color: var(--morelighter);
+    border: 0;
+    outline: none;
+    font-size: 1em;
+    border-radius: 0.2em;
+    color: #fff;
+    padding: 0.3em 0.4em;
+    letter-spacing: .3px;
+    overflow: hidden;
+    resize: both;
+    display: block;
+}
+
+
+.textarea[disabled] {
     background-color: var(--lighter);
 }
 
@@ -138,16 +191,6 @@ textarea[disabled] {
     background-color: var(--darker);
     border-radius: 0.3em;
     padding: .4em .5em;
-}
-
-.left-bottom {
-    position: absolute;
-    left: 2%;
-    bottom: 50px;
-    width: 96%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: .5em;
 }
 
 .mybtn button:hover {

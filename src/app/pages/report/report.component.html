@@ -1,0 +1,58 @@
+<div class="mycontainer">
+
+    <h3>REPORT</h3>
+
+    <ng-container *ngIf="purpose === 'notIdentifiedElements'">
+        <p class="explanation">These elements have been identified as texts that need to be translated. 
+            You can add these translations now. If you want to omit their translations, remove the identifiers.
+            You can also go back to the template view. 
+            It is not recommended to translate a template with elements not translated but with identifiers.
+            This list should be empty before you translate the template
+        </p>
+        <h4>Identified elements without translations:</h4>
+    </ng-container>
+
+
+    <div class="elements">
+
+        <div class="myrow head">
+            <p>IDENTIFIER:</p>
+            <p>TEXTS:</p>
+        </div>
+
+        <div *ngFor="let el of elements" class="group">
+            <div class="myrow" *ngFor="let text of el[originLanguage]; index as index">
+                <p>{{index===0 ? el.identifier : '...'}}</p>
+                <p>{{text}}</p>
+                <input 
+                    type="text" 
+                    placeholder="translation..." 
+                    (keyup)="0" 
+                    [(ngModel)]="el[translateTo][index]"
+                >
+                <div class="mybtn" *ngIf="index === 0">
+                    <button (click)="addTranslation(el)" [disabled]="isDisabled(el[translateTo])">add translations</button>
+                </div>
+                <div class="mybtn red" *ngIf="index === 0">
+                    <button (click)="removeIdentifier(el.identifier)" type="button">remove identifier</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="languages">
+        <div>
+            <p>origin language:</p>
+            <p>{{originLanguage}}</p>
+        </div>
+        <div>
+            <p>translate to language:</p>
+            <p>{{translateTo}}</p>
+        <p></p>
+    </div>
+
+    <div class="mybtn center">
+        <button (click)="goBack()">GO BACK</button>
+    </div>
+</div>

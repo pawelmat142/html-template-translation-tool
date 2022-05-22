@@ -1,16 +1,65 @@
+<!-- LEFT BAR -->
+
+<div class="left tool-bg">
+    
+    <div *ngIf="originTexts && originTexts.length" class="areas">
+        <ng-container *ngFor="let text of originTexts; index as index">
+            <div class="textarea-wrapper">
+                <p class="origin textarea">{{text}}</p>
+            </div>
+            <div class="textarea-wrapper">
+                <span 
+                    contenteditable
+                    class="textarea" 
+                    role="textbox"
+                    #translationAreaRef
+                >{{translations[index]}}</span>
+            </div>
+        </ng-container>
+    </div>
+    
+    <div class="identifier cont">
+        <p class="title">IDENTIFIER:</p>
+        <p class="text-field">{{identifier || "none..." }}</p>
+        <div class="mybtn full red">
+            <button 
+                (click)="removeIdentifier()"
+                [disabled]="!identifier"
+            >remove</button>
+        </div>
+        <div class="mybtn full">
+            <button 
+                (click)="onAddTranslation()" 
+                [disabled]="!(translateToLanguageObs | async)"
+            >ADD TRANSLATION</button>
+        </div>
+        <div class="mybtn red full">
+            <button (click)="onUnselect()" [disabled]="!identifier">unselect</button>
+        </div>
+        <div class="mybtn red full">
+            <button 
+                (click)="removeTranslation()" 
+                [disabled]="!identifier || !(translateToLanguageObs | async)"
+            >remove translation</button>
+        </div>
+    </div>
+
+</div>
+
 <!-- BOTTOM BAR -->
 
-<div class="bottom tool-bg">
+<div class="bottom tool-bg" (mouseenter)="classes='hover'" (mouseleave)="classes=''">
+
     <div class="myrow">
+        
+        <div>
+            <p class="title">project:</p>
+            <p class="filename text-field">{{projectName || "No project..."}}</p>
+        </div>
 
         <div>
             <p class="title">filename:</p>
             <p class="filename text-field">{{fileName || "No file..."}}</p>
-        </div>
-
-        <div>
-            <p class="title">project:</p>
-            <p class="filename text-field">{{projectName || "No project..."}}</p>
         </div>
 
         <div class="langs">
@@ -22,13 +71,34 @@
             <div class="mybtn min blue">
                 <button (click)="onChooseLanguage()">to:   </button>
             </div>
-            <p class="text-field">{{(toChangeLanguageObs | async | tittlecase)  || "none..." }}</p>
+            <p class="text-field">{{(translateToLanguageObs | async | tittlecase)  || "none..." }}</p>
         </div>
         
         <div class="right"> 
-            <div></div>
+            <div class="mybtn blue">
+                <button (click)="autoIdentify()">AUTO IDENTIFY</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="hidden-row">
+
+        <div>
+            <div class="mybtn blue">
+                <button (click)="saveTemplate()">SAVE TEMPLATE</button>
+            </div>
             <div class="mybtn">
-                <button (click)="onSave()">SAVE</button>
+                <button (click)="translateTemplate()" [disabled]="!(translateToLanguageObs | async)">TRANSLATE TEMPLATE</button>
+            </div>
+            <div class="mybtn blue">
+                <button (click)="generateTemplate()" [disabled]="!(translateToLanguageObs | async)">GENERATE TEMPLATE</button>
+            </div>
+        </div>
+
+        <div>
+            <div class="mybtn blue">
+                <button (click)="onOriginDownload()">download origin file</button>
             </div>
             <div class="mybtn red">
                 <button (click)="onLeave()">PROJECTS</button>
@@ -39,68 +109,6 @@
         </div>
 
     </div>
-</div>
 
-
-<!-- LEFT BAR -->
-
-<div class="left tool-bg">
-    
-    <div class="identifier cont">
-        <p class="title">IDENTIFIER:</p>
-        <p class="text-field">{{(identifierObs | async | tittlecase)  || "none..." }}</p>
-        <div class="mybtn full red">
-            <button 
-                (click)="removeIdentifier()"
-                [disabled]="!(identifierObs | async)"
-            >remove</button>
-        </div>
-        <div class="mybtn full">
-            <button 
-                (click)="addIndentifier()" 
-                [disabled]="(identifierObs | async) || !(stringToTranslateObs | async)"
-            >ADD</button>
-        </div>
-    </div>
-
-
-    <textarea disabled >{{stringToTranslateObs | async}}</textarea>
-    
-    <div class="left-middle">
-        <div></div>
-        <div class="mybtn red">
-            <button 
-                (click)="onClearButton()"
-                [disabled]="!(stringToTranslateObs | async)"
-            >unselect</button>
-        </div>
-    </div>
-    
-    <textarea 
-        [disabled]="!(identifierObs|async) || !(stringToTranslateObs|async) || (toChangeLanguageObs|async) === 'none'"
-        [(ngModel)]="translationArea">
-    </textarea>
-
-    <div class="mybtn full">
-        <button 
-            (click)="onTranslate()" 
-            [disabled]="!translationArea || !(toChangeLanguageObs | async)"
-        >ADD TRANSLATION</button>
-    </div>
-
-    <div class="cont left-bottom">
-        <div class="mybtn blue full">
-            <button>lorem ipsum</button>
-        </div>
-        <div class="mybtn blue full">
-            <button>ipsum</button>
-        </div>
-        <div class="mybtn blue full">
-            <button>dolor</button>
-        </div>
-        <div class="mybtn blue full">
-            <button (click)="autoIdentify()">auto identify</button>
-        </div>
-    </div>
 
 </div>
