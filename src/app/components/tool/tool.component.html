@@ -4,17 +4,20 @@
     
     <div *ngIf="originTexts && originTexts.length" class="areas">
         <ng-container *ngFor="let text of originTexts; index as index">
+
             <div class="textarea-wrapper">
                 <p class="origin textarea">{{text}}</p>
             </div>
+
             <div class="textarea-wrapper">
                 <span 
                     contenteditable
                     class="textarea" 
                     role="textbox"
                     #translationAreaRef
-                >{{translations[index]}}</span>
+                >{{translateToTexts[index]}}</span>
             </div>
+
         </ng-container>
     </div>
     
@@ -86,7 +89,10 @@
 
         <div>
             <div class="mybtn blue">
-                <button (click)="saveTemplate()">SAVE TEMPLATE</button>
+                <button (click)="saveTemplate()" [disabled]="generated">SAVE TEMPLATE</button>
+            </div>
+            <div class="mybtn blue">
+                <button (click)="translateImages()" [disabled]="!(translateToLanguageObs | async)">add img translations</button>
             </div>
             <div class="mybtn">
                 <button (click)="translateTemplate()" [disabled]="!(translateToLanguageObs | async)">TRANSLATE TEMPLATE</button>
@@ -97,6 +103,9 @@
         </div>
 
         <div>
+            <div class="mybtn red">
+                <button (click)="removeAllIdentifiers()">remove all identifiers</button>
+            </div>
             <div class="mybtn blue">
                 <button (click)="onOriginDownload()">download origin file</button>
             </div>

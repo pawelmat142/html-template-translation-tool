@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
-import { AngularFirestore } from '@angular/fire/compat/firestore'
 import { GoogleAuthProvider, GithubAuthProvider, User } from '@angular/fire/auth'
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -14,7 +13,6 @@ export class AuthenticationService {
 
   constructor(
     private fireauth: AngularFireAuth,
-    private firestore: AngularFirestore,
     private router: Router,
   ) { 
     

@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataService } from './data.service';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Collection } from '../models/collection'
-import { DomSanitizer } from '@angular/platform-browser';
 import { LanguagesService } from './languages.service';
 import { TranslationElement } from '../models/translationElement';
 import { DialogService } from './dialog.service';
@@ -16,6 +15,7 @@ export class ProjectService {
   project: Collection
   get name() { return this.project.name }
   get filename() { return this.project.filename }
+
   saved: boolean = false
 
   private _file: File
@@ -45,12 +45,12 @@ export class ProjectService {
   constructor(
     private db: DataService,
     private dialog: DialogService,
-    private lang: LanguagesService,
+    private language: LanguagesService,
   ) {
     this.db.getUserProjectsObs().subscribe(result => this.userProjects = result)
   }
 
-
+  
   // PROJECTS MANAGMENT
 
   async addProject(newProject: Collection): Promise<boolean> {
@@ -87,7 +87,7 @@ export class ProjectService {
     try { 
       await this.db.updateProject(this.project)
       await this.db.uploadFile(file)
-      await this.db.addTranslationDocs(this.project.name, this.lang.origin, translationElements)
+      await this.db.addTranslationDocs(this.project.name, this.language.origin, translationElements)
     } catch (error) { console.log(error) }
   }
 
@@ -104,7 +104,7 @@ export class ProjectService {
   async generateTemplate(newConent: string) { 
     try {
       let filename = this.project.filename.split('.')[0] + '_'
-        + this.lang.translateToFull.code + '.html'
+        + this.language.translateToFull.code + '.html'
       let file = new File(
         [this.getFileText(newConent)],
         filename,

@@ -1,0 +1,11 @@
+:host {
+    display: flex;
+    height: 99vh;
+}
+
+.template-component {
+    width: 70vw;
+    height: 100%;
+    background-color: #fff;
+    overflow: auto;
+}

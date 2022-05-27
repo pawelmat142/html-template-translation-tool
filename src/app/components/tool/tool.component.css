@@ -1,7 +1,5 @@
 :host {
-    height: 100%;
-    position: relative;
-    transition: .12s ease-in-out;
+    height: 99vh;
 }
 
 .tool-bg {
@@ -113,7 +111,12 @@
 /* LEFT BAR */
 
 .left { 
-    position: relative;
+    /* position: fixed; */
+    /* left: 0; */
+    /* top: 0; */
+    width: 30vw;
+
+    /* position: relative; */
     height: 100%;
     padding: 0 .3em;
     color: #000;

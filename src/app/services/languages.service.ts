@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Language } from '../models/language';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { throws } from 'assert';
-import { DialogService } from './dialog.service';
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +54,9 @@ export class LanguagesService {
   private translateToObs = new BehaviorSubject<Language>(this.initial)
   private _translateTo: Language
 
-  constructor() {
+  constructor(
+  ) {
+
     this.originObs.subscribe(l => this._origin = l)
     this.translateToObs.subscribe(l => this._translateTo = l)
   }
@@ -112,9 +112,6 @@ export class LanguagesService {
     return this.langs.find(l => l.name === name) as Language
   }
 
-  getByCode(code: String): Language {
-    return this.langs.find(l => l.code === code) as Language
-  }
 
   set translateTo(name: string) { 
     if (this.list.includes(name)) {

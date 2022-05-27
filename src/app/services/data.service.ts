@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore'
-import { LanguagesService } from './languages.service';
 import { Observable, map, catchError } from 'rxjs';
 import { Collection } from '../models/collection';
 import { Router } from '@angular/router';
-import { deleteField, doc } from "firebase/firestore";
-import { DialogService } from './dialog.service';
 import { getStorage, ref, uploadBytes, deleteObject, getBlob } from "firebase/storage"
 import { TranslationElement } from '../models/translationElement';
 
@@ -19,9 +16,7 @@ export class DataService {
 
   constructor(
     private firestore: AngularFirestore,
-    private language: LanguagesService,
     private router: Router,
-    private dialog: DialogService,
   ) { }
   
   get uid(): string {
@@ -32,7 +27,6 @@ export class DataService {
 
   get newId(): string { return this.firestore.createId() }
   
-
   // PROJECTS
 
   getUserProjectsObs(): Observable<Collection[]> {
@@ -70,13 +64,6 @@ export class DataService {
       .doc(name)
       .delete()
   }
-
-  // async getProject(projectName: string) { 
-  //   return await this.firestore
-  //     .collection(this.uid)
-  //     .doc(projectName)
-  //     .ref.get()
-  // }
 
   // IDENTIFIERS
 

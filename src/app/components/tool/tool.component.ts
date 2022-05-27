@@ -7,6 +7,7 @@ import { TemplateService } from 'src/app/services/template.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { Language } from 'src/app/models/language';
+import { TranslationElement } from 'src/app/models/translationElement';
 
 
 // USER INTERFACE / TOOLS TO LOAD AND MODIFY TEMPLATE
@@ -18,9 +19,9 @@ import { Language } from 'src/app/models/language';
 })
 export class ToolComponent implements OnInit {
 
-  @Input() identifier: string
-  @Input() originTexts: string[]
-  @Input() translateToTexts: string[]
+  identifier: string = ''
+  @Input() originTexts: string[] = []
+  @Input() translateToTexts: string[] = []
 
   @Output() removeIdentifierEvent = new EventEmitter<void>()
   @Output() unselectEvent = new EventEmitter<void>()
@@ -28,6 +29,7 @@ export class ToolComponent implements OnInit {
   @Output() saveTemplateEvent = new EventEmitter<void>()
   @Output() translateTemplateEvent = new EventEmitter<void>()
   @Output() generateEvent = new EventEmitter<void>()
+  @Output() removeAllIdentifiersEvent = new EventEmitter<void>()
 
   @ViewChildren('translationAreaRef')
   translationAreaRefs: ElementRef[]
@@ -38,6 +40,8 @@ export class ToolComponent implements OnInit {
   projectName: string
   originLanguageObs: Observable<string>
   translateToLanguageObs: Observable<string>
+
+  generated: boolean = false
 
   constructor(
     private language: LanguagesService,
@@ -57,22 +61,9 @@ export class ToolComponent implements OnInit {
       .getTranslateToObs().pipe(map((language: Language) => language.name))
   }
 
-  translations: string[]
 
   ngOnInit(): void {
     // this.template.unselect()
-  }
-
-  ngOnChanges(change: SimpleChanges): void {
-    // triggered by onActiveElement() - template component
-    if (!change.originTexts.firstChange) {
-      let newOriginTexts = change['originTexts'].currentValue
-      console.log(newOriginTexts)
-      this.translations = newOriginTexts.map(el => '')
-      if (this.translateToTexts && this.translateToTexts.length) { 
-        this.translations = this.translateToTexts
-      }
-    }
   }
 
   // LEFT BAR
@@ -123,11 +114,21 @@ export class ToolComponent implements OnInit {
   
   // HIDDEN ROW
 
+  translateImages(): void {
+    this.template.translateImages()
+  }
+
   saveTemplate(): void { this.saveTemplateEvent.emit() }
   
-  translateTemplate() { this.translateTemplateEvent.emit() }
+  translateTemplate() {
+    this.translateTemplateEvent.emit()
+    this.generated = true
+  }
   
-  generateTemplate() { this.generateEvent.emit() }
+  generateTemplate() {
+    this.generateEvent.emit()
+    this.generated = true
+  }
 
   async onLeave() {
     await this.askIfSave()
@@ -135,6 +136,15 @@ export class ToolComponent implements OnInit {
     this.router.navigate(['projects'])
   }
   
+  async removeAllIdentifiers() {
+    await this.askIfRemoveAllIdentifiers()
+    this.template.borders.removeAll()
+    await this.template.identificator.removeAll(this.project.name)
+    this.template.translationElements = []
+    this.saveTemplateEvent.emit()
+    this.dialog.setDialogOnlyHeader('All identifiers removed!')
+  }
+
   onOriginDownload() { this.project.downloadOriginFile(this.project.name) }
   
   onLogout(): void { this.auth.logout() }
@@ -147,6 +157,16 @@ export class ToolComponent implements OnInit {
       this.dialog.setDialogWithConfirmButton(
         'Warning!',
         'Are you sure you want to leave before saving project?',
+        resolve,
+      )
+    })
+  }
+
+  askIfRemoveAllIdentifiers() {
+    return new Promise(resolve => {
+      this.dialog.setDialogWithConfirmButton(
+        'Warning!',
+        'Are you sure you want to remove all identifiers and translations?!',
         resolve,
       )
     })

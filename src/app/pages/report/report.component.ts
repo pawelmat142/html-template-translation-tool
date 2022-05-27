@@ -73,7 +73,6 @@ export class ReportComponent implements OnInit, OnDestroy {
       this.elements = this.elements.filter(el => el.identifier !== identifier)
       this.dialog.setDialogOnlyHeader('Succesfull!')
     } catch (error) {
-      // this.dialog.setDialogOnlyHeader(error.message)
       this.dialog.setDialogOnlyHeader('db: update doc error')
     }
   }
@@ -82,29 +81,12 @@ export class ReportComponent implements OnInit, OnDestroy {
     return !translations.every(t => t !== '')
   }
 
-  async translateAnyway(): Promise<void> { 
-    await this.askIfSure()
-  }
 
   goBack(): void {
     if (this.identifiersToRemove && this.identifiersToRemove.length) { 
-      this.template.identifiersToRemove = this.identifiersToRemove
+      this.template.setIdentifiersToRemove(this.identifiersToRemove)
     }
     this.router.navigate(['main'])
-  }
-
-
-
-  // OTHERS
-  
-  askIfSure() {
-    return new Promise(resolve => {
-      this.dialog.setDialogWithConfirmButton(
-        'Are you sure?',
-        'this is not a recommended option!',
-        resolve,
-      )
-    })
   }
 
 }

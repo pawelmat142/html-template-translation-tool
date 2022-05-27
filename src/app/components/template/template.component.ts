@@ -1,32 +1,24 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, Output, ViewChild, EventEmitter, Input, AfterViewInit } from '@angular/core';
 import { TemplateService } from 'src/app/services/template.service';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TranslationElement } from 'src/app/models/translationElement';
-import { DomSanitizer } from '@angular/platform-browser';
-import { ToolComponent } from '../tool/tool.component';
-
 
 // DISPLAY AND MODIFY LOADED TEMPLATE
 
 @Component({
   selector: 'app-template',
-  templateUrl: './template.component.html',
-  styleUrls: ['./template.component.css']
+  template: `<div #contentRef>before initialization !</div>`,
+  // styleUrls: ['./template.component.css']
+  styleUrls: []
 })
-export class TemplateComponent implements OnInit, OnDestroy{
+export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  @ViewChild(ToolComponent) tools: ToolComponent
+  @ViewChild('contentRef') contentRef: ElementRef<HTMLElement>
 
-  // tool component binding
-  identifier: string
-  originTexts: string[]
-  translateToTexts: string[]
-
-  templateTxt: any
-
-  @ViewChild('contentReference')
-  private contentRef: ElementRef
+  @Output() identifier = new EventEmitter<string>()
+  @Output() originTexts = new EventEmitter<string[]>()
+  @Output() translateToTexts = new EventEmitter<string[]>()
 
   private selectedElement: HTMLElement
   private activeElement: HTMLElement
@@ -35,29 +27,34 @@ export class TemplateComponent implements OnInit, OnDestroy{
     private template: TemplateService,
     private language: LanguagesService,
     private project: ProjectService,
-    private domSanitizer: DomSanitizer,
-  ) {
-    this.project.getTemplateObs().subscribe(
-      body => this.initializeTemplate(body))
-  
-    this.language.getTranslateToObs()
-      .subscribe(l => l.name && this.template.inititializeBorders())
-  }
+  ) {}
   
   ngOnInit() {
+    this.project.getTemplateObs().subscribe(t => this.initializeTemplate(t))
+    this.language.getTranslateToObs()
+      .subscribe(l => l.name && this.template.initBorders())
     this.project.initTemplateObs()
-    this.template.removeIdentifiersToRemove()
+    setTimeout(() => {
+      this.template.identificator
+        .removeIdentifiersToRemove(this.project.name)
+    }, 5000)
   }
-  
-  ngOnDestroy() {}
 
+  ngAfterViewInit(): void {
+    this.template.reference = this.contentRef.nativeElement
+  }
+
+  ngOnDestroy(): void {
+    
+  }
+    
   // TEMPLATE INITIALIZATION 
-
+  
   private async initializeTemplate(fileAsTxt: string) {
-    this.templateTxt =  this.domSanitizer.bypassSecurityTrustHtml(fileAsTxt)
-    await this.template.getTranslationElements()
-    this.template.inititializeBorders()
-  }
+    this.contentRef.nativeElement.innerHTML = fileAsTxt
+    await this.template.initTranslationElements()
+    this.template.initBorders()
+}
 
   // MOUSE EVENT ACTIONS
 
@@ -127,15 +124,13 @@ export class TemplateComponent implements OnInit, OnDestroy{
       this.setActiveStyles(element)
       let identifier = element.getAttribute('identifier')
       if (identifier) {
-        this.identifier = identifier
+        this.identifier.emit(identifier)
         this.template.setActiveTranslationElement(identifier)
-        let originLanguage = this.language.origin
-        if (this.template.activeTranslationElement.hasOwnProperty(originLanguage)) {
-          this.originTexts = this.template.activeTranslationElement[originLanguage]
+        if (this.template.activeTranslationElement.hasOwnProperty(this.language.origin)) {
+          this.originTexts.emit(this.template.activeTranslationElement[this.language.origin])
         }
-        let translateTo = this.language.translateTo
-        if (this.template.activeTranslationElement.hasOwnProperty(translateTo)) {
-          this.translateToTexts = this.template.activeTranslationElement[translateTo]
+        if (this.template.activeTranslationElement.hasOwnProperty(this.language.translateTo)) {
+          this.translateToTexts.emit(this.template.activeTranslationElement[this.language.translateTo])
         } 
       }
     }
@@ -147,9 +142,9 @@ export class TemplateComponent implements OnInit, OnDestroy{
     this.removeListeners(element)
     this.activeElement = null
     this.selectedElement = null
-    this.identifier = ''
-    this.originTexts = []
-    this.translateToTexts = []
+    this.identifier.emit('')
+    this.originTexts.emit([])
+    this.translateToTexts.emit([])
     this.innerBefore = ''
   }
   
@@ -159,8 +154,6 @@ export class TemplateComponent implements OnInit, OnDestroy{
       element.parentNode?.replaceChild(newElement, element)
     }
   }
-
-  // STYLING
 
   private setSelectStyles(element: HTMLElement): void {
     if (this.selectedElement) { 
@@ -184,7 +177,7 @@ export class TemplateComponent implements OnInit, OnDestroy{
   }
 
   
-  // FROM TOOL COMPONENT
+  // FROM TOOL COMPONENT - buttons
 
   removeIdentifier() { 
     this.template.removeElementIdentifier(this.activeElement)
@@ -199,7 +192,7 @@ export class TemplateComponent implements OnInit, OnDestroy{
 
   async autoIdentify() {
     let content = this.contentRef.nativeElement as Node
-    this.template.identifyElementLoop(content)
+    this.template.identify(content)
   }
 
   unselect(): void {
@@ -209,8 +202,10 @@ export class TemplateComponent implements OnInit, OnDestroy{
   generateTemplate() {
     this.contentRef.nativeElement.querySelectorAll('[style]')
       .forEach(el => el.removeAttribute('style'))
+    this.contentRef.nativeElement.querySelectorAll('[identifier]')
+      .forEach(el => el.removeAttribute('identifier'))
     let newContent = this.getContentBody()
-    this.template.generateTemplate(newContent)
+    this.project.generateTemplate(newContent)
   }
   
   translateTemplate() { 
@@ -223,26 +218,6 @@ export class TemplateComponent implements OnInit, OnDestroy{
 
   getTranslationElement(identifier: string): TranslationElement { 
     return this.template.translationElements.find(e => e.identifier === identifier)
-  }
-
-  private getIdentifiersFromNodeList(elements: NodeList): string[] {
-    let result: string[] = []
-    elements.forEach((el: HTMLElement) => { 
-      let identifier = el.getAttribute('identifier')
-      if (identifier) result.push(identifier)
-    })
-    return result
-  }
-
-  private setTranslationIfExist(): void {
-    let identifeir = this.activeElement.getAttribute('identifier')
-    if (identifeir) {
-      let element = this.template.translationElements
-        .find(el => el.identifier === identifeir)
-      if (element && element.hasOwnProperty(this.language.translateTo)) {
-        this.template.translation = element[this.language.translateTo]
-      }
-    }
   }
 
   private getContentBody() { 

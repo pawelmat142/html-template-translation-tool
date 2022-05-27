@@ -37,7 +37,8 @@ h4 {
     display: grid;
     grid-template-columns: 2fr 5fr 5fr 2fr 2fr;
     align-items: center;
-    height: 45px;
+    min-height: 45px;
+    padding: .3em 0;
 }
 
 .elements .myrow input {
