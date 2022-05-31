@@ -1,9 +1,11 @@
-import { TranslationElement } from "../models/translationElement";
-import { LanguagesService } from "../services/languages.service";
+import { Injectable } from '@angular/core';
+import { TranslationElement } from '../models/translationElement';
+import { LanguagesService } from './languages.service';
 
-// sets borders to identified/ translated elements
-
-export class Borders { 
+@Injectable({
+  providedIn: 'root'
+})
+export class BordersService {
 
   blue = '#41a4a6'
   green = '#63aa55'
@@ -14,7 +16,7 @@ export class Borders {
   constructor(
     private language: LanguagesService
   ) { }
-  
+
   init(translationElements: TranslationElement[]): void {
     translationElements.forEach(el => { 
       let element = document.querySelector(`[identifier="${el.identifier}"]`)

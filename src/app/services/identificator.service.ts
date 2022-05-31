@@ -1,9 +1,8 @@
-// IDENTIFY 
-
-import { TranslationElement } from "../models/translationElement"
-import { DataService } from "../services/data.service"
-import { DialogService } from "../services/dialog.service"
-import { LanguagesService } from "../services/languages.service"
+import { Injectable } from '@angular/core';
+import { TranslationElement } from '../models/translationElement';
+import { DataService } from './data.service';
+import { DialogService } from './dialog.service';
+import { LanguagesService } from './languages.service';
 
 const METADATAS = [
   'description'
@@ -16,7 +15,12 @@ const AVOID = [
   'STYLE'
 ]
 
-export class Identificator { 
+@Injectable({
+  providedIn: 'root'
+})
+export class IdentificatorService {
+  
+  translationElements: TranslationElement[]
 
   blue = '#41a4a6'
   green = '#63aa55'
@@ -24,11 +28,14 @@ export class Identificator {
   templateReference: HTMLElement
 
   constructor(
-    private translationElements: TranslationElement[],
     private db: DataService,
     private dialog: DialogService,
     private language: LanguagesService,
-  ) { console.log('identificator init')}
+  ) { console.log('identificator init') }
+
+  // loadElements(elements: TranslationElement[]): void {
+  //   this.translationElements = elements
+  // }
 
   identify(contentToIdentify: Node, translationElements: TranslationElement[]): TranslationElement[] { 
     this.translationElements = translationElements
@@ -151,7 +158,6 @@ export class Identificator {
     }
   }
 
-
   async removeAll(projectName): Promise<void> {
     try { 
       let identifiedElements = document.querySelectorAll('[identifier]')
@@ -184,6 +190,4 @@ export class Identificator {
       }
     })
   }
-
-
 }

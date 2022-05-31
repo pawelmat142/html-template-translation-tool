@@ -79,7 +79,7 @@
         
         <div class="right"> 
             <div class="mybtn blue">
-                <button (click)="borders()">borders</button>
+                <button (click)="onBorders()">borders</button>
             </div>
             <div class="mybtn blue">
                 <button (click)="autoIdentify()">AUTO IDENTIFY</button>
@@ -111,7 +111,7 @@
                 <button (click)="generateTemplate()" [disabled]="!(translateToLanguageObs | async)">GENERATE TEMPLATE</button>
             </div>
             <div class="mybtn blue">
-                <button (click)="head()" [disabled]="!(translateToLanguageObs | async)">head</button>
+                <button (click)="translateHead()" [disabled]="!(translateToLanguageObs | async)">head</button>
             </div>
         </div>
 

@@ -7,6 +7,7 @@ import { TemplateService } from 'src/app/services/template.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { Language } from 'src/app/models/language';
+import { BordersService } from 'src/app/services/borders.service';
 
 
 // USER INTERFACE / TOOLS TO LOAD AND MODIFY TEMPLATE
@@ -49,6 +50,7 @@ export class ToolComponent implements OnInit {
     private auth: AuthenticationService,
     private project: ProjectService,
     private router: Router,
+    private borders: BordersService
   ) {
     this.originLanguageObs = this.language
     .getOriginObs().pipe(map((language: Language) => language.name))
@@ -112,9 +114,9 @@ export class ToolComponent implements OnInit {
     this.autoIdentifyEvent.emit()
   }
 
-  borders(): void {
-    const flag = this.template.borders.flag
-    if (flag) this.template.borders.removeAll()
+  onBorders(): void {
+    const flag = this.borders.flag
+    if (flag) this.borders.removeAll()
     else this.template.initBorders()
   }
   
@@ -139,8 +141,8 @@ export class ToolComponent implements OnInit {
     this.generated = true
   }
   
-  head(): void {
-    this.template.head()
+  translateHead(): void {
+    this.template.translateHead()
   }
 
 
@@ -154,8 +156,8 @@ export class ToolComponent implements OnInit {
   async removeAllIdentifiers() {
     await this.dialog.confirmDialog('Warning!',
       'Are you sure you want to remove all identifiers and translations?!')
-    this.template.borders.removeAll()
-    await this.template.identificator.removeAll(this.project.name)
+    this.borders.removeAll()
+    await this.template.removeAll()
     this.template.translationElements = []
     this.saveTemplateEvent.emit()
     this.dialog.setDialogOnlyHeader('All identifiers removed!')
