@@ -23,7 +23,6 @@ export class TemplateService {
 
   identificator: Identificator
   borders: Borders
-
   
   constructor(
     private db: DataService,
@@ -53,17 +52,28 @@ export class TemplateService {
   activeTranslationElement: TranslationElement  
 
   async initTranslationElements(): Promise<void> {
-    this.translationElements = await this.db
+    this.translationElements = []
+    let notInTemplate: string[] = []
+    const translationElements = await this.db
       .getProjectTranslationDocs(this.project.name)
+    translationElements.forEach(el => {
+      const node = document.querySelector(`[identifier="${el.identifier}"]`)
+      if (node) this.translationElements.push(el)
+      else notInTemplate.push(el.identifier)
+    })
+    if (notInTemplate.length > 0) { 
+      this.db.deleteTranslationDocuments(this.project.name, notInTemplate)
+    }
   }
   
-  // ELEMENTS TRANSLATION
-
   setActiveTranslationElement(identifier: string): void { 
     this.activeTranslationElement = this.translationElements
-      .find(el => el.identifier === identifier)
+    .find(el => el.identifier === identifier)
   }
 
+  
+  // ELEMENTS TRANSLATION
+  
   async setTranslation(translations: string[], _identifier?: string): Promise<void> {
     let identifier = _identifier ? _identifier : this.activeTranslationElement.identifier
     if (this.activeTranslationElement) { 
@@ -95,57 +105,68 @@ export class TemplateService {
     }
   }
 
+  async untranslated() { 
+    let notTranslated = this.getElementsWithoutTranslations(this.language.translateTo)
+    if (notTranslated && notTranslated.length > 0) {
+        this.report.elements = notTranslated
+        this.router.navigate(['report'])
+    } else { 
+      this.dialog.setDialogOnlyHeader('All elements are translated')
+    }
+  }
     
   // TEMPLATE TRANSLATION PROCESS
 
-  async translateTemplate(newContent: string) {
-    let translateTo = this.language.translateTo
-    let origin = this.language.origin
-  
-    let translations = this.translationElements
-      .filter(el => el.hasOwnProperty(translateTo))
-  
-    let elementsWithoutTranslations = this.translationElements
-      .filter(el => !el.hasOwnProperty(translateTo))
-
-    if (elementsWithoutTranslations && elementsWithoutTranslations.length) {
-      this.report.elements = elementsWithoutTranslations
-      this.router.navigate(['report'])
-      return
-    } else {  // TRANSLATION
-      let translated: string[] = []
-      let toTranslate: string[] = []
-      translations.forEach((el: TranslationElement) => { 
-        el[origin].forEach(e => toTranslate.push(e))
-        let element: HTMLElement = document.querySelector(`[identifier="${el.identifier}"]`)
-        if (element) {
-          console.log(element.tagName)
-          if (element.tagName.toLocaleLowerCase() === 'img' ||
-            element.tagName.toLocaleLowerCase() === 'amp-img')
-          {
-            let txtToChange = el[translateTo].shift()
-            console.log(txtToChange)
-            element.setAttribute('alt', txtToChange)
-            translated.push(txtToChange)
-          } else {
-            let nodes = element.childNodes
-            nodes.forEach(node => { 
-              if (node.nodeType === Node.TEXT_NODE) {
-                let nodeAsText = node as Text
-                let str = nodeAsText.data.replace(/\s/g, '').replace(/\n/g, '')
-                if (str) {
-                  let txtToChange = el[translateTo].shift()
-                  node.nodeValue = txtToChange
-                  translated.push(txtToChange)
-                }
-              }
-            })
-          }
-        }
-      })
-      console.log(toTranslate)
-      console.log(translated)
+  async translateTemplate(translated: boolean): Promise<boolean> {
+    let from = translated ? this.language.translateTo : this.language.origin
+    let to = translated ? this.language.origin : this.language.translateTo
+    
+    let notTranslated = this.getElementsWithoutTranslations(to)
+    if (notTranslated && notTranslated.length) {
+      await this.dialog.confirmDialog('Not all elements are translated',
+      'Are you sure you want to translate anyway? If not go to untranslated')
     }
+     // TRANSLATION
+    let translations = this.translationElements
+      .filter(el => el.hasOwnProperty(this.language.translateTo))
+    
+    let translatedarr: string[] = []
+    let toTranslate: string[] = []
+
+    translations.forEach((el: TranslationElement) => { 
+      el[from].forEach(e => toTranslate.push(e))
+      let element: HTMLElement = document.querySelector(`[identifier="${el.identifier}"]`)
+      if (element) {
+        if (element.tagName.toLocaleLowerCase() === 'img' ||
+          element.tagName.toLocaleLowerCase() === 'amp-img')
+        {
+          let txtToChange = el[to][0]
+          console.log(txtToChange)
+          element.setAttribute('alt', txtToChange)
+          translatedarr.push(txtToChange)
+        } else if (element.tagName.toLocaleLowerCase() === 'meta') {
+          let txtToChange = el[to][0]
+          element.setAttribute('content', txtToChange)
+          translatedarr.push(txtToChange)
+        } else {
+          let nodes = element.childNodes
+          nodes.forEach((node, i) => { 
+            if (node.nodeType === Node.TEXT_NODE) {
+              let nodeAsText = node as Text
+              let str = nodeAsText.data.replace(/\s/g, '').replace(/\n/g, '')
+              if (str) {
+                let txtToChange = el[to][i]
+                node.nodeValue = txtToChange
+                translatedarr.push(txtToChange)
+              }
+            }
+          })
+        }
+      }
+    })
+    console.log(toTranslate)
+    console.log(translatedarr)
+    return translated ? false : true
   }
 
   translateImages(): void {
@@ -184,6 +205,10 @@ export class TemplateService {
     this.identificator.removeElementIdentifier(element, this.project.name)
   }
 
+  removeIdentifiersToRemove(): void {
+    this.identificator.removeIdentifiersToRemove(this.project.name)
+  }
+
   // borders
   initBorders(): void {this.borders.init(this.translationElements)}
   setAsTranslated(identifier: string) {this.borders.setAsTranslated(identifier)}
@@ -192,15 +217,30 @@ export class TemplateService {
 
   // OTHERS
 
-  async saveTemplate(contentBodyAfterIdentify: string) {
-    this.translationElements = this.translationElements
-      .filter(el => contentBodyAfterIdentify.includes(el.identifier))
-    await this.project.saveTemplate(contentBodyAfterIdentify, this.translationElements)
+  private getElementsWithoutTranslations(translateToLanguage: string): TranslationElement[] { 
+    return this.translationElements.filter(el => !el.hasOwnProperty(translateToLanguage))
+  }
+
+  async saveTemplate(file: File) {
+    await this.project.saveTemplate(file, this.translationElements)
     this.dialog.setDialogOnlyHeader('Project saved successfully!')
-    this.borders.init(this.translationElements)
   }
 
   unescapeHTML(escapedHTML: string): string {
     return escapedHTML.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ');
+  }
+
+  head(): void {
+    let elementsToTranslate: TranslationElement[] = []
+    this.translationElements.forEach(el => {
+      let a: HTMLElement = document.querySelector(`[identifier="${el.identifier}"]`)
+      if (a && a.tagName.toLocaleLowerCase() === 'meta') {
+        if (!el.hasOwnProperty(this.language.translateTo)) { 
+          elementsToTranslate.push(el)
+          this.report.elements = elementsToTranslate
+          this.router.navigate(['report'])
+        }
+      }
+    })
   }
 }

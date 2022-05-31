@@ -7,7 +7,6 @@ import { TemplateService } from 'src/app/services/template.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { Language } from 'src/app/models/language';
-import { TranslationElement } from 'src/app/models/translationElement';
 
 
 // USER INTERFACE / TOOLS TO LOAD AND MODIFY TEMPLATE
@@ -27,7 +26,6 @@ export class ToolComponent implements OnInit {
   @Output() unselectEvent = new EventEmitter<void>()
   @Output() autoIdentifyEvent = new EventEmitter<void>()
   @Output() saveTemplateEvent = new EventEmitter<void>()
-  @Output() translateTemplateEvent = new EventEmitter<void>()
   @Output() generateEvent = new EventEmitter<void>()
   @Output() removeAllIdentifiersEvent = new EventEmitter<void>()
 
@@ -42,6 +40,7 @@ export class ToolComponent implements OnInit {
   translateToLanguageObs: Observable<string>
 
   generated: boolean = false
+  translated: boolean = false
 
   constructor(
     private language: LanguagesService,
@@ -51,18 +50,17 @@ export class ToolComponent implements OnInit {
     private project: ProjectService,
     private router: Router,
   ) {
-    this.fileName = this.project.file.name
-    this.projectName = this.project.project.name
-
     this.originLanguageObs = this.language
-      .getOriginObs().pipe(map((language: Language) => language.name))
+    .getOriginObs().pipe(map((language: Language) => language.name))
     
     this.translateToLanguageObs = this.language
-      .getTranslateToObs().pipe(map((language: Language) => language.name))
+    .getTranslateToObs().pipe(map((language: Language) => language.name))
   }
 
 
   ngOnInit(): void {
+    this.fileName = this.project.filename
+    this.projectName = this.project.project.name
     // this.template.unselect()
   }
 
@@ -110,7 +108,15 @@ export class ToolComponent implements OnInit {
     this.dialog.open()
   }
   
-  autoIdentify(): void { this.autoIdentifyEvent.emit() }
+  autoIdentify(): void {
+    this.autoIdentifyEvent.emit()
+  }
+
+  borders(): void {
+    const flag = this.template.borders.flag
+    if (flag) this.template.borders.removeAll()
+    else this.template.initBorders()
+  }
   
   // HIDDEN ROW
 
@@ -118,26 +124,36 @@ export class ToolComponent implements OnInit {
     this.template.translateImages()
   }
 
+  untranslated(): void {
+    this.template.untranslated()
+  }
+
   saveTemplate(): void { this.saveTemplateEvent.emit() }
   
-  translateTemplate() {
-    this.translateTemplateEvent.emit()
-    this.generated = true
+  async translateTemplate() {
+    this.translated = await this.template.translateTemplate(this.translated)
   }
   
   generateTemplate() {
     this.generateEvent.emit()
     this.generated = true
   }
+  
+  head(): void {
+    this.template.head()
+  }
+
 
   async onLeave() {
-    await this.askIfSave()
-    this.project.file = null
+    await this.dialog.confirmDialog('Warning!',
+      'Are you sure you want to remove all identifiers and translations?!',)
+    this.project.clear()
     this.router.navigate(['projects'])
   }
   
   async removeAllIdentifiers() {
-    await this.askIfRemoveAllIdentifiers()
+    await this.dialog.confirmDialog('Warning!',
+      'Are you sure you want to remove all identifiers and translations?!')
     this.template.borders.removeAll()
     await this.template.identificator.removeAll(this.project.name)
     this.template.translationElements = []
@@ -151,26 +167,6 @@ export class ToolComponent implements OnInit {
 
 
   // OTHERS
-
-  askIfSave() {
-    return new Promise(resolve => {
-      this.dialog.setDialogWithConfirmButton(
-        'Warning!',
-        'Are you sure you want to leave before saving project?',
-        resolve,
-      )
-    })
-  }
-
-  askIfRemoveAllIdentifiers() {
-    return new Promise(resolve => {
-      this.dialog.setDialogWithConfirmButton(
-        'Warning!',
-        'Are you sure you want to remove all identifiers and translations?!',
-        resolve,
-      )
-    })
-  }
 
   private fillSpacesIfNeeds(translations: string[]): string[] {
     let result = translations.map(el => el)

@@ -35,15 +35,16 @@ h4 {
 
 .elements .myrow {
     display: grid;
-    grid-template-columns: 2fr 5fr 5fr 2fr 2fr;
+    grid-template-columns: 2fr 5fr 5fr 1fr 1fr;
     align-items: center;
     min-height: 45px;
     padding: .3em 0;
 }
 
-.elements .myrow input {
+.elements .myrow textarea {
     margin: 3px 0;
     text-align: left;
+    height: 100%;
 }
 
 .elements .myrow.head {

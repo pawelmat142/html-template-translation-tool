@@ -37,8 +37,8 @@ export class ReportComponent implements OnInit, OnDestroy {
     
     this.originLanguage = this.language.origin
     this.translateTo = this.language.translateTo
-    this.originLanguage = 'polish'
-    this.translateTo = 'english'
+    // this.originLanguage = 'polish'
+    // this.translateTo = 'english'
     
     this.elements = this.service.elements.map(el => {
       el[this.translateTo] = el[this.originLanguage].map(e => '')

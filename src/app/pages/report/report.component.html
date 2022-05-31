@@ -24,17 +24,18 @@
             <div class="myrow" *ngFor="let text of el[originLanguage]; index as index">
                 <p>{{index===0 ? el.identifier : '...'}}</p>
                 <p>{{text}}</p>
-                <input 
+                <textarea
+                    class="myinput"
                     type="text" 
                     placeholder="translation..." 
                     (keyup)="0" 
                     [(ngModel)]="el[translateTo][index]"
-                >
+                ></textarea>
                 <div class="mybtn" *ngIf="index === 0">
-                    <button (click)="addTranslation(el)" [disabled]="isDisabled(el[translateTo])">add translations</button>
+                    <button (click)="addTranslation(el)" [disabled]="isDisabled(el[translateTo])">translate</button>
                 </div>
                 <div class="mybtn red" *ngIf="index === 0">
-                    <button (click)="removeIdentifier(el.identifier)" type="button">remove identifier</button>
+                    <button (click)="removeIdentifier(el.identifier)" type="button">remove</button>
                 </div>
             </div>
         </div>

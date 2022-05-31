@@ -60,7 +60,20 @@ export class DialogService {
     this.dialog.confirmFunction = null
   }
 
-  setDialogWithConfirmButton(
+  promise: Promise<void>
+
+  confirmDialog(header: string, text?: string) {
+    this.promise = new Promise((resolve) => {
+      this.setDialogWithConfirmButton(
+        header,
+        text ? text : '',
+        resolve
+      )
+    })
+    return this.promise
+  }
+
+  private setDialogWithConfirmButton(
     header: string,
     text: string,
     confirmFunction: Function,
@@ -78,6 +91,5 @@ export class DialogService {
     this.dialog.header = header
     this.open()
   }
-  
 }
 

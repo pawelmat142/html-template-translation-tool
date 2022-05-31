@@ -79,6 +79,9 @@
         
         <div class="right"> 
             <div class="mybtn blue">
+                <button (click)="borders()">borders</button>
+            </div>
+            <div class="mybtn blue">
                 <button (click)="autoIdentify()">AUTO IDENTIFY</button>
             </div>
         </div>
@@ -94,11 +97,21 @@
             <div class="mybtn blue">
                 <button (click)="translateImages()" [disabled]="!(translateToLanguageObs | async)">add img translations</button>
             </div>
+            <div class="mybtn green">
+                <button (click)="untranslated()" [disabled]="!(translateToLanguageObs | async)">untranslated</button>
+            </div>
             <div class="mybtn">
-                <button (click)="translateTemplate()" [disabled]="!(translateToLanguageObs | async)">TRANSLATE TEMPLATE</button>
+                <button 
+                    (click)="translateTemplate()" 
+                    [disabled]="!(translateToLanguageObs | async)"
+                    [innerHTML]="translated ? 'BACK TO ORIGIN' : 'TRANSLATE TEMPLATE'"
+                ></button>
             </div>
             <div class="mybtn blue">
                 <button (click)="generateTemplate()" [disabled]="!(translateToLanguageObs | async)">GENERATE TEMPLATE</button>
+            </div>
+            <div class="mybtn blue">
+                <button (click)="head()" [disabled]="!(translateToLanguageObs | async)">head</button>
             </div>
         </div>
 

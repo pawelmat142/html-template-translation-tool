@@ -7,6 +7,7 @@ import { DialogService } from 'src/app/services/dialog.service';
 import { Collection } from '../../models/collection';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { Observable } from 'rxjs'
+import { FileService } from 'src/app/services/file.service';
 
 @Component({
   selector: 'app-projects',
@@ -29,7 +30,6 @@ export class ProjectsComponent {
     private router: Router,
     private language: LanguagesService,
   ) { 
-    
     this.languages = this.language.list
     this.userProjectsObs = this.db.getUserProjectsObs()
   }
@@ -44,8 +44,6 @@ export class ProjectsComponent {
     try { 
       if (this.service.filenameTaken(file)) throw new Error('file name is taken!')
       if (!this.htmlFile(file)) throw new Error('file has to be HTML!')
-      if (!(await this.service.hasBodySlicers(file)))
-        throw new Error('file has to contain 2x <!-- bodyslicer -->')
       this.filenameAdding = file.name
       this.inputOpen = true
       this.service.fileForNewProject = file
@@ -80,10 +78,7 @@ export class ProjectsComponent {
   }
 
   async onSetProject(project: Collection) {
-    let file = await this.db.downloadFile(project.filename)
-    this.service.file = file
-    this.service.project = project
-    this.language.setOriginLanguage(project.originLanguage)
+    this.service.setProject(project) // TRIGGERS TEMPLATE INITIALIZATION
     this.router.navigate(['main'])
   }
     

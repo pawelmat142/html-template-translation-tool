@@ -9,6 +9,8 @@ export class Borders {
   green = '#63aa55'
   orange = '#db863b'
 
+  flag = false
+
   constructor(
     private language: LanguagesService
   ) { }
@@ -27,6 +29,7 @@ export class Borders {
         }
       }
     })
+    this.flag = true
   }
 
 
@@ -51,6 +54,7 @@ export class Borders {
   removeAll(): void {
     let identifiedElements = document.querySelectorAll('[identifier]')
     identifiedElements.forEach(this.removeBorder)
+    this.flag = false
   }
 
   setAsTranslated(identifier: string): void { 

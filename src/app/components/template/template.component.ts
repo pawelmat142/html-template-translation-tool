@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnDestroy, OnInit, Output, ViewChild, EventEmitter, Input, AfterViewInit } from '@angular/core';
 import { TemplateService } from 'src/app/services/template.service';
 import { LanguagesService } from 'src/app/services/languages.service';
-import { ProjectService } from 'src/app/services/project.service';
 import { TranslationElement } from 'src/app/models/translationElement';
+import { FileService } from 'src/app/services/file.service';
 
 // DISPLAY AND MODIFY LOADED TEMPLATE
 
@@ -15,6 +15,7 @@ import { TranslationElement } from 'src/app/models/translationElement';
 export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('contentRef') contentRef: ElementRef<HTMLElement>
+  get ref(): HTMLElement { return this.contentRef?.nativeElement }
 
   @Output() identifier = new EventEmitter<string>()
   @Output() originTexts = new EventEmitter<string[]>()
@@ -26,34 +27,31 @@ export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private template: TemplateService,
     private language: LanguagesService,
-    private project: ProjectService,
+    private file: FileService
   ) {}
   
-  ngOnInit() {
-    this.project.getTemplateObs().subscribe(t => this.initializeTemplate(t))
+  ngOnInit() {}
+  ngAfterViewInit() {
+    this.file.getTemplateConentObs().subscribe(t => this.initTemplate(t))
     this.language.getTranslateToObs()
       .subscribe(l => l.name && this.template.initBorders())
-    this.project.initTemplateObs()
-    setTimeout(() => {
-      this.template.identificator
-        .removeIdentifiersToRemove(this.project.name)
-    }, 5000)
-  }
+    setTimeout(() => this.template.removeIdentifiersToRemove(), 5000)
+    this.template.reference = this.ref
+  } 
+  ngOnDestroy = () => ''
 
-  ngAfterViewInit(): void {
-    this.template.reference = this.contentRef.nativeElement
-  }
-
-  ngOnDestroy(): void {
-    
-  }
-    
-  // TEMPLATE INITIALIZATION 
+  // ngOnDestroy = () => this.file.clear()
   
-  private async initializeTemplate(fileAsTxt: string) {
-    this.contentRef.nativeElement.innerHTML = fileAsTxt
-    await this.template.initTranslationElements()
-    this.template.initBorders()
+
+  // TEMPLATE INITIALIZATION
+
+  private async initTemplate(content: string) {
+    if (content) { 
+      console.log('init template')
+      this.ref.innerHTML = content
+      await this.template.initTranslationElements()
+      this.template.initBorders()
+    }
 }
 
   // MOUSE EVENT ACTIONS
@@ -184,15 +182,15 @@ export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async saveTemplate() {
-    this.contentRef.nativeElement.querySelectorAll('[style]')
+    this.ref.querySelectorAll('[style]')
       .forEach(el => el.removeAttribute('style'))
-    let contentBodyAfterIdentify = this.getContentBody()
-    this.template.saveTemplate(contentBodyAfterIdentify)
+    let file = this.file.refresh(this.ref)
+    this.template.saveTemplate(file)
+    this.template.initBorders()
   }
 
   async autoIdentify() {
-    let content = this.contentRef.nativeElement as Node
-    this.template.identify(content)
+    this.template.identify(this.ref as Node)
   }
 
   unselect(): void {
@@ -204,13 +202,7 @@ export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
       .forEach(el => el.removeAttribute('style'))
     this.contentRef.nativeElement.querySelectorAll('[identifier]')
       .forEach(el => el.removeAttribute('identifier'))
-    let newContent = this.getContentBody()
-    this.project.generateTemplate(newContent)
-  }
-  
-  translateTemplate() { 
-    let newContent = this.getContentBody()
-    this.template.translateTemplate(newContent)
+    this.file.generateTemplate(this.ref, this.language.translateToFull)
   }
   
   
@@ -220,8 +212,4 @@ export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.template.translationElements.find(e => e.identifier === identifier)
   }
 
-  private getContentBody() { 
-    return this.contentRef.nativeElement.innerHTML
-      .split('<!-- bodyslicer -->')[1]
-  }
 }

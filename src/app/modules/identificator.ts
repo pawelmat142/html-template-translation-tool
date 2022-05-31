@@ -5,6 +5,17 @@ import { DataService } from "../services/data.service"
 import { DialogService } from "../services/dialog.service"
 import { LanguagesService } from "../services/languages.service"
 
+const METADATAS = [
+  'description'
+]
+
+const AVOID = [
+  'SCRIPT',
+  'LINK',
+  'NOSCRIPT',
+  'STYLE'
+]
+
 export class Identificator { 
 
   blue = '#41a4a6'
@@ -21,6 +32,7 @@ export class Identificator {
 
   identify(contentToIdentify: Node, translationElements: TranslationElement[]): TranslationElement[] { 
     this.translationElements = translationElements
+    this.identifyHead(contentToIdentify as HTMLElement)
     this.identifyLoop(contentToIdentify)
     this.identifyImages()
     return this.translationElements
@@ -52,7 +64,7 @@ export class Identificator {
         if (!elem[this.language.origin].includes(txtToTranslate)) { 
           elem[this.language.origin].push(txtToTranslate)
         }
-      } else if (parentElement.tagName.toUpperCase() !== 'SCRIPT') {
+      } else if (!AVOID.includes(parentElement.tagName.toUpperCase())) {
         let newIdentifier = this.db.newId
         parentElement.setAttribute('identifier', newIdentifier)
         let newTranslationElement: TranslationElement = {
@@ -82,7 +94,7 @@ export class Identificator {
     }
   }
 
-  private identifyImages(): void{
+  private identifyImages(): void {
     this.translationElements = []
     this.templateReference
       .querySelectorAll('amp-img')
@@ -123,9 +135,9 @@ export class Identificator {
   identifiersToRemove: string[] = []
 
   async removeIdentifiersToRemove(projectName: string): Promise<void> {
-    console.log('removeIdentifiersToRemove')
-    console.log(this.identifiersToRemove)
     if (this.identifiersToRemove && this.identifiersToRemove.length) { 
+      console.log('removeIdentifiersToRemove')
+      console.log(this.identifiersToRemove)
       this.identifiersToRemove.forEach(id => { 
         let element = document.querySelector(`[identifier="${id}"]`)
         if (element) element.removeAttribute('identifier')
@@ -153,5 +165,25 @@ export class Identificator {
       this.identifiersToRemove = []
     } catch (error) { console.log(error.message) }
   }
+
+  identifyHead(node: HTMLElement): void {
+    const nodeList = node.querySelectorAll('meta')
+    nodeList.forEach(n => {
+      const attribute = n.getAttribute('name')
+      if (attribute && METADATAS.includes(attribute)) { 
+        const content = n.getAttribute('content')
+        if (content) { 
+          const newIdentifier = this.db.newId
+          n.setAttribute('identifier', newIdentifier)
+          let newTranslationElement: TranslationElement = {
+            identifier: newIdentifier,
+            [this.language.origin]: [content]
+          }
+          this.translationElements.push(newTranslationElement)
+        }
+      }
+    })
+  }
+
 
 }
