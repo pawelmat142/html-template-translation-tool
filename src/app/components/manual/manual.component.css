@@ -1,0 +1,45 @@
+:host {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 45vw;
+    height: 100%;
+    background-color: var(--dark);
+}
+
+:host(.manual-show) {
+    animation: show-manual .15s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+:host(.manual-hide) {
+    animation: hide-manual .15s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+
+@keyframes show-manual {
+    from { transform: translateX(100%)}
+    to { transform: translateX(0)}
+}
+
+@keyframes hide-manual {
+    from { transform: translateX(0)}
+    to { transform: translateX(100%)}
+}
+
+.htt-manual-container {
+    padding: 10vh 0 10vh;
+    height: 100vh;
+    background: #bebebe;
+    border-left: 2px solid #000;
+    font-size: 1.2em;
+    overflow: auto;
+}
+
+.htt-manual-container > ul {
+    list-style: disc;
+}
+
+.htt-manual-container > ul > li {
+    margin-top: 15px;
+    list-style: disc;
+}

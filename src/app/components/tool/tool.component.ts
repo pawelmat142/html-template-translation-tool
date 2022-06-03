@@ -29,6 +29,7 @@ export class ToolComponent implements OnInit, OnChanges {
   @Output() saveTemplateEvent = new EventEmitter<void>()
   @Output() generateEvent = new EventEmitter<void>()
   @Output() removeAllIdentifiersEvent = new EventEmitter<void>()
+  @Output() openManualEvent = new EventEmitter<void>()
 
   @ViewChildren('translationAreaRef')
   translationAreaRefs: QueryList<ElementRef>

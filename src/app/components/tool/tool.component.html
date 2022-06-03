@@ -79,6 +79,9 @@
         </div>
         
         <div class="right"> 
+            <div class="mybtn green">
+                <button (click)="openManualEvent.emit()">!?! MANUAL !?!</button>
+            </div>
             <div class="mybtn blue">
                 <button (click)="onBorders()">borders</button>
             </div>
@@ -98,6 +101,9 @@
             <div class="mybtn blue">
                 <button (click)="translateImages()" [disabled]="!(translateTo)">add img translations</button>
             </div>
+            <div class="mybtn blue">
+                <button (click)="translateHead()" [disabled]="!(translateTo)">add head translations</button>
+            </div>
             <div class="mybtn green">
                 <button (click)="untranslated()" [disabled]="!(translateTo)">untranslated</button>
             </div>
@@ -110,9 +116,6 @@
             </div>
             <div class="mybtn blue">
                 <button (click)="generateTemplate()" [disabled]="!(translateTo)">GENERATE TEMPLATE</button>
-            </div>
-            <div class="mybtn blue">
-                <button (click)="translateHead()" [disabled]="!(translateTo)">head</button>
             </div>
         </div>
 

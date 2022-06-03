@@ -48,9 +48,16 @@ h3 {
     min-width: 200px;
 }
 
+.add-project-container {
+    margin: 50px auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
 .add-project {
     max-width: 300px;
-    margin: 50px auto 20px;
 }
 
 .add-project > div {
@@ -95,6 +102,16 @@ h3 {
     padding: 0 20%;
 }
 
+.add-project-container > ul {
+    font-size: 1.1em;
+    list-style: disc;
+}
+
+.add-project-container > ul > li {
+    list-style: disc;
+    margin-top: 20px;
+}
+
 .buttons {
     margin-top: 40px;
     margin-bottom: 20px;
@@ -110,4 +127,12 @@ h3 {
 
 .cssButtons button {
     margin: 0 2px!important;
+}
+
+.no-projects {
+    text-align: center;
+    margin: 0 auto;
+    max-width: 60%;
+    font-size: 1.3em;
+    padding-top: 30px;
 }

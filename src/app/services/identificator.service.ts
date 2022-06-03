@@ -5,7 +5,11 @@ import { DialogService } from './dialog.service';
 import { LanguagesService } from './languages.service';
 
 const METADATAS = [
-  'description'
+  'description',
+  'author',
+  'keywords',
+  'application-name',
+  'generator'
 ]
 
 const AVOID = [

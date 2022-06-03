@@ -5,6 +5,7 @@
     (unselectEvent)="template.unselect()"
     (removeIdentifierEvent)="template.removeIdentifier()"
     (generateEvent)="template.generateTemplate()"
+    (openManualEvent)="openManual()"
     [originTexts]="originTexts"
 ></app-tool>
 
@@ -17,3 +18,5 @@
     (mousemove)="template.onMousemove($event.target)"
     (click)="$event.preventDefault()"
 ></app-template>
+
+<app-manual *ngIf="manualActive"></app-manual>

@@ -29,6 +29,7 @@ import { DialogComponent } from './components/dialog/dialog.component';
 // PIPES
 import { TittlecasePipe } from './pipes/tittlecase.pipe';
 import { ReportComponent } from './pages/report/report.component';
+import { ManualComponent } from './components/manual/manual.component';
 
 
 @NgModule({
@@ -44,6 +45,7 @@ import { ReportComponent } from './pages/report/report.component';
     DialogComponent,
     ProjectsComponent,
     ReportComponent,
+    ManualComponent,
   ],
   imports: [
     BrowserModule,

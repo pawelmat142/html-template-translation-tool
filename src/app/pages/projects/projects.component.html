@@ -1,7 +1,7 @@
 
 <div class="mycontainer">
 
-    <h3>SET PROJECT:</h3>
+    <h3>SELECT PROJECT:</h3>
 
     <div class="projects">
 
@@ -35,7 +35,7 @@
             <p>{{project.modified.split(' ').shift()}}</p>
             <p>{{project.modified.split(' ').pop()}}</p>
             <div class="mybtn center">
-                <button (click)="onSetProject(project)">SET</button>
+                <button (click)="onSetProject(project)">SELECT</button>
             </div>
             <div class="mybtn center red">
                 <button (click)="onDelete(project)">delete</button>
@@ -45,37 +45,51 @@
     </div>
 
 
+    <div *ngIf="(userProjectsObs | async)?.length === 0 && !inputOpen" class="no-projects">
+        To start first project press ADD NEW PROJECT and select your html template file.
+    </div>
+
     
-    <div *ngIf="inputOpen" class="add-project">
-        
-        <div>
-            <label>file name:</label>
-            <p class="myinput" disabled>{{filenameAdding || "Choose file ..."}}</p>
-        </div>
-        
-        <div>
-            <label>css file (optional):</label>
-            <div class="file-input-container">
-                <p class="myinput">{{cssFilenameAdding || "Choose file ..."}}</p>
-                <input type="file" class="myinput" (change)="onCssFileSelected($event)" >
+    <div *ngIf="inputOpen" class="add-project-container">
+
+        <div class="add-project">
+            <div>
+                <label>file name:</label>
+                <p class="myinput" disabled>{{filenameAdding || "Choose file ..."}}</p>
+            </div>
+            
+            <div>
+                <label>css file (optional):</label>
+                <div class="file-input-container">
+                    <p class="myinput">{{cssFilenameAdding || "Choose file ..."}}</p>
+                    <input type="file" class="myinput" (change)="onCssFileSelected($event)" >
+                </div>
+            </div>
+            <div>
+                <label>project name:</label>
+                <input type="text" placeholder="set project name..." [(ngModel)]="input">
+            </div>
+            <div>
+                <label>origin language:</label>
+                <select #languageRef>
+                    <option disabled>Select Language</option>
+                    <option *ngFor="let l of languages" value="{{l}}">{{l}}</option>
+                </select>
             </div>
         </div>
-        <div>
-            <label>project name:</label>
-            <input type="text" placeholder="set project name..." [(ngModel)]="input">
-        </div>
-        <div>
-            <label>origin language:</label>
-            <select #languageRef>
-                <option disabled>Select Language</option>
-                <option *ngFor="let l of languages" value="{{l}}">{{l}}</option>
-            </select>
-        </div>
-        <div class="mybtn center">
-            <button (click)="onAddNewProject()" [disabled]="!input">ADD PROJECT</button>
-        </div>
+
+        <ul>
+            <li>Select CSS file if your template <br>does not contain inline them</li>
+            <li>Enter a project name</li>
+            <li>Select the original language <br>of the template</li>
+            <li>Add a project to the list</li>
+        </ul>        
+
     </div>
     
+    <div class="mybtn center" *ngIf="inputOpen">
+        <button (click)="onAddNewProject()" [disabled]="!input">ADD PROJECT</button>
+    </div>
 
     <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
 
