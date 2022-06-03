@@ -10,7 +10,8 @@
             </div>
 
             <div class="textarea-wrapper">
-                <span 
+                <span
+                    (keydown)="$event.key === 'Enter' ? $event.preventDefault() : ''"
                     contenteditable
                     class="textarea" 
                     role="textbox"
@@ -33,16 +34,16 @@
         <div class="mybtn full">
             <button 
                 (click)="onAddTranslation()" 
-                [disabled]="!(translateToLanguageObs | async)"
+                [disabled]="!(translateTo)"
             >ADD TRANSLATION</button>
         </div>
         <div class="mybtn red full">
             <button (click)="onUnselect()" [disabled]="!identifier">unselect</button>
         </div>
         <div class="mybtn red full">
-            <button 
+            <button
                 (click)="removeTranslation()" 
-                [disabled]="!identifier || !(translateToLanguageObs | async)"
+                [disabled]="!identifier || !(translateTo)"
             >remove translation</button>
         </div>
     </div>
@@ -74,7 +75,7 @@
             <div class="mybtn min blue">
                 <button (click)="onChooseLanguage()">to:   </button>
             </div>
-            <p class="text-field">{{(translateToLanguageObs | async | tittlecase)  || "none..." }}</p>
+            <p class="text-field">{{(translateTo | tittlecase)  || "none..." }}</p>
         </div>
         
         <div class="right"> 
@@ -95,23 +96,23 @@
                 <button (click)="saveTemplate()" [disabled]="generated">SAVE TEMPLATE</button>
             </div>
             <div class="mybtn blue">
-                <button (click)="translateImages()" [disabled]="!(translateToLanguageObs | async)">add img translations</button>
+                <button (click)="translateImages()" [disabled]="!(translateTo)">add img translations</button>
             </div>
             <div class="mybtn green">
-                <button (click)="untranslated()" [disabled]="!(translateToLanguageObs | async)">untranslated</button>
+                <button (click)="untranslated()" [disabled]="!(translateTo)">untranslated</button>
             </div>
             <div class="mybtn">
                 <button 
                     (click)="translateTemplate()" 
-                    [disabled]="!(translateToLanguageObs | async)"
+                    [disabled]="!(translateTo)"
                     [innerHTML]="translated ? 'BACK TO ORIGIN' : 'TRANSLATE TEMPLATE'"
                 ></button>
             </div>
             <div class="mybtn blue">
-                <button (click)="generateTemplate()" [disabled]="!(translateToLanguageObs | async)">GENERATE TEMPLATE</button>
+                <button (click)="generateTemplate()" [disabled]="!(translateTo)">GENERATE TEMPLATE</button>
             </div>
             <div class="mybtn blue">
-                <button (click)="translateHead()" [disabled]="!(translateToLanguageObs | async)">head</button>
+                <button (click)="translateHead()" [disabled]="!(translateTo)">head</button>
             </div>
         </div>
 

@@ -6,6 +6,7 @@ import { LanguagesService } from './languages.service';
 import { TranslationElement } from '../models/translationElement';
 import { DialogService } from './dialog.service';
 import { FileService } from './file.service';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,12 +23,14 @@ export class ProjectService {
   openReportObs = new Subject<void>()
 
   fileForNewProject: File
+  cssFileForNewProject: File
 
   constructor(
     private db: DataService,
     private dialog: DialogService,
     private language: LanguagesService,
-    private fileService: FileService
+    private fileService: FileService,
+    private auth: AuthenticationService,
   ) {
     this.db.getUserProjectsObs()
       .subscribe(result => this.userProjects = result)
@@ -36,19 +39,19 @@ export class ProjectService {
   async setProject(project: Collection) { 
     this.project = project
     this.language.setOriginLanguage(project.originLanguage)
+    if (project.cssName) {
+      const cssFile = await this.db.downloadFile(project.cssName)
+      await this.fileService.setCss(cssFile)
+    }
     let file: File = await this.db.downloadFile(project.filename)
     this.fileService.initFile(file)
   }
 
-
   clear(): void {
     this.project = null
     this.fileForNewProject = null
+    this.cssFileForNewProject = null
     this.fileService.clear()
-  }
-
-  unescapeHTML(escapedHTML: string): string {
-    return escapedHTML.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ');
   }
 
 
@@ -56,30 +59,33 @@ export class ProjectService {
 
   async addProject(newProject: Collection): Promise<boolean> {
     await this.db.uploadFile(this.fileForNewProject)
-    let originFilename = this.fileForNewProject.name.split('.')[0] + '_origin.html'
-    let fileOrigin = new File(
-      [this.fileForNewProject],
-      originFilename,
-      { type: this.fileForNewProject.type }
-    )
-    await this.db.uploadFile(fileOrigin)
+    if (this.cssFileForNewProject) {
+      const cssFile = this.renameCssFile()
+      newProject.cssName = cssFile.name
+      await this.db.uploadFile(cssFile)
+    }
+    await this.db.uploadFile(this.renameOrigin())
     await this.db.addProject(newProject)
+    this.fileForNewProject = null
+    this.cssFileForNewProject = null
     return true
   }
 
-  async deleteProject(projectName: string) { 
-    await this.dialog.confirmDialog('Warning!', 'Are you sure you want to delete this project?')
-    let filename = this.userProjects.find(project => project.name === projectName).filename
-    await this.db.deleteFile(filename)
-    let originFilename = filename.split('.')[0] + '_origin.html' 
+  async deleteProject(projectName: string, notAsk?: boolean) {
+    if (!notAsk) { 
+      await this.dialog.confirmDialog('Warning!', 'Are you sure you want to delete this project?')
+    }
+    const project = this.userProjects.find(project => project.name === projectName)
+    await this.db.deleteFile(project.filename)
+    if (project.cssName) await this.db.deleteFile(project.cssName)
+    let originFilename = project.filename.split('.')[0] + '_origin.html' 
     await this.db.deleteFile(originFilename)
     // await this.db.deleteTranslationDocs(projectName)
     await this.db.removeUserProject(projectName)
   }
   
   async saveTemplate(file: File, translationElements: TranslationElement[]) {
-    this.project.modified = new Date().toLocaleDateString()
-      + ' ' + new Date().toLocaleTimeString()
+    this.project.modified = this.currentTime()
     try { 
       await this.db.updateProject(this.project)
       await this.db.uploadFile(file)
@@ -96,6 +102,37 @@ export class ProjectService {
       let file: File = await this.db.downloadFile(filename)
       this.fileService.download(file)
     } catch (error) { console.log(error) }
+  }
+
+  async addCssFile(projectName: string, file: File) { 
+    let project = this.userProjects.find(p => p.name === projectName)
+    
+    const cssFile = this.renameCssFile(project.filename, file)
+    await this.db.uploadFile(cssFile)
+    
+    project.modified = this.currentTime()
+    project.cssName = cssFile.name
+    await this.db.updateProject(project)
+  }
+
+  async deleteCssFile(projectName: string) { 
+    let project = this.userProjects.find(p => p.name === projectName)
+    project.modified = this.currentTime()
+    await this.db.deleteFile(project.cssName)
+    project.cssName = ''
+    await this.db.updateProject(project)
+  }
+
+
+  // ACCOUNT
+  async deleteAccount() {
+    console.log(this.userProjects)
+    await Promise.all(this.userProjects.map(async p => await this.deleteProject(p.name, true)))
+    await this.auth.deleteAccount()
+  }
+
+  logout(): void { 
+    this.auth.logout()
   }
 
 
@@ -116,6 +153,28 @@ export class ProjectService {
     let count = fileAsText.split('<!-- bodyslicer -->').length
     if (count === 3) return true
     else return false
+  }
+
+  private renameOrigin(): File {
+    return new File(
+      [this.fileForNewProject],
+      this.fileForNewProject.name.split('.')[0]+'_origin.html',
+      { type: 'text/html' }
+    )
+  }
+
+  private renameCssFile(_filename?: string, _cssFile?: File): File {
+    const filename = _filename ? _filename : this.fileForNewProject.name
+    const cssFile = _cssFile ? _cssFile : this.cssFileForNewProject
+    return new File(
+      [cssFile],
+      filename.split('.')[0]+'.css',
+      { type: 'text/css' }
+    )
+  }
+
+  private currentTime(): string { 
+    return new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
   }
 
 }

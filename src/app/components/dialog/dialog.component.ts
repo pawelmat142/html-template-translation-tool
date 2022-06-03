@@ -1,4 +1,4 @@
-import { Component, HostBinding } from '@angular/core';
+import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
 import { Dialog } from 'src/app/models/dialog';
 import { Collection } from 'src/app/models/collection';
 import { DialogService } from 'src/app/services/dialog.service';
@@ -12,17 +12,11 @@ import { Observable } from 'rxjs';
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.css']
 })
-export class DialogComponent {
+export class DialogComponent implements OnDestroy {
 
   @HostBinding('class') classes = ''
 
-  input: string = ''
   languages: string[]
-
-  collectionsObs: Observable<Collection[]>
-  collections: Collection[]
-
-  fileName: string = ''
 
   private dialog: Dialog = {
     open: false,
@@ -36,7 +30,7 @@ export class DialogComponent {
   ) {
     this.languages = this.language.list
 
-    this.service.getObs().subscribe((dialog: any) => {
+    this.service.getObs().subscribe((dialog: Dialog) => {
       if (dialog.open) {
         this.dialog = dialog;
         this.open()
@@ -64,10 +58,11 @@ export class DialogComponent {
   close(): void { 
     if (this.classes === 'open') {
       this.classes += ' close'
+      this.service.active = false
       setTimeout(() => this.classes = '', 200)
     }
   }
-
+  
   open(): void {
     if (this.classes === '') { 
       this.classes = 'open'
@@ -77,5 +72,19 @@ export class DialogComponent {
   setLanguage(language: string): void {
     this.language.translateTo = language
     this.service.purpose = ''
+  }
+
+  ngOnDestroy(): void {
+    this.service.active = false
+    console.log('destroy')
+  }
+
+  // KEYBOARD
+
+  @HostListener('window:keyup', ['$event.key'])
+  keyEvent(key: string) {
+    if (key === 'Escape' || key === 'Enter') { 
+      if (this.service.active) this.close()
+    }
   }
 }

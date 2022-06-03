@@ -5,14 +5,15 @@
     (unselectEvent)="template.unselect()"
     (removeIdentifierEvent)="template.removeIdentifier()"
     (generateEvent)="template.generateTemplate()"
+    [originTexts]="originTexts"
 ></app-tool>
 
-<app-template 
+<app-template
     #template
     class="template-component"
     (identifier)="tool.identifier=$event"
-    (originTexts)="tool.originTexts=$event"
+    (originTexts)="originTexts=$event"
     (translateToTexts)="tool.translateToTexts=$event"
     (mousemove)="template.onMousemove($event.target)"
-    (click)="$event.preventDefault()" 
+    (click)="$event.preventDefault()"
 ></app-template>

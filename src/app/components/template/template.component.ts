@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, Output, ViewChild, EventEmitter, Input, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, Output, ViewChild, EventEmitter, AfterViewInit, HostListener } from '@angular/core';
 import { TemplateService } from 'src/app/services/template.service';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { TranslationElement } from 'src/app/models/translationElement';
@@ -8,11 +8,9 @@ import { FileService } from 'src/app/services/file.service';
 
 @Component({
   selector: 'app-template',
-  template: `<div #contentRef>before initialization !</div>`,
-  // styleUrls: ['./template.component.css']
-  styleUrls: []
+  template: `<div #contentRef>before initialization !</div>`
 })
-export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
+export class TemplateComponent implements AfterViewInit {
 
   @ViewChild('contentRef') contentRef: ElementRef<HTMLElement>
   get ref(): HTMLElement { return this.contentRef?.nativeElement }
@@ -28,20 +26,16 @@ export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
     private template: TemplateService,
     private language: LanguagesService,
     private file: FileService
-  ) {}
+  ) { }
   
-  ngOnInit() {}
   ngAfterViewInit() {
     this.file.getTemplateConentObs().subscribe(t => this.initTemplate(t))
     this.language.getTranslateToObs()
       .subscribe(l => l.name && this.template.initBorders())
-    setTimeout(() => this.template.removeIdentifiersToRemove(), 5000)
+    // setTimeout(() => this.template.removeIdentifiersToRemove(), 5000)
     this.template.reference = this.ref
   } 
-  ngOnDestroy = () => ''
 
-  // ngOnDestroy = () => this.file.clear()
-  
 
   // TEMPLATE INITIALIZATION
 
@@ -50,9 +44,18 @@ export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log('init template')
       this.ref.innerHTML = content
       await this.template.initTranslationElements()
+      this.template.removeIdentifiersToRemove()
+      if (this.file.css) this.initStylesheet()
       this.template.initBorders()
     }
-}
+  }
+
+  private initStylesheet() {
+    let element: HTMLElement = document.createElement('style')
+    element.setAttribute('type', 'text/css')
+    element.innerHTML = this.file.css
+    this.ref.appendChild(element)
+  }
 
   // MOUSE EVENT ACTIONS
 
@@ -144,6 +147,7 @@ export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
     this.originTexts.emit([])
     this.translateToTexts.emit([])
     this.innerBefore = ''
+    this.template.activeTranslationElement = null
   }
   
   private removeListeners(element: HTMLElement) { 
@@ -198,13 +202,25 @@ export class TemplateComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   generateTemplate() {
+    const temp = this.contentRef.nativeElement.innerHTML
     this.contentRef.nativeElement.querySelectorAll('[style]')
       .forEach(el => el.removeAttribute('style'))
     this.contentRef.nativeElement.querySelectorAll('[identifier]')
       .forEach(el => el.removeAttribute('identifier'))
     this.file.generateTemplate(this.ref, this.language.translateToFull)
+    this.contentRef.nativeElement.innerHTML = temp
   }
-  
+
+
+  // KEYBOARD
+
+  @HostListener('window:keyup', ['$event.key'])
+  keyEvent(key: string) {
+    if (key === 'Escape' && this.activeElement) {
+      this.deactivate(this.activeElement)
+    }
+  }
+
   
   // OTHERS
 

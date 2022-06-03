@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, SimpleChanges, ViewChildren, ElementRef, HostBinding } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, SimpleChanges, ViewChildren, ElementRef, HostBinding, HostListener, OnChanges, QueryList } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, map } from 'rxjs';
 import { DialogService } from 'src/app/services/dialog.service';
@@ -17,7 +17,7 @@ import { BordersService } from 'src/app/services/borders.service';
   templateUrl: './tool.component.html',
   styleUrls: ['./tool.component.css']
 })
-export class ToolComponent implements OnInit {
+export class ToolComponent implements OnInit, OnChanges {
 
   identifier: string = ''
   @Input() originTexts: string[] = []
@@ -31,15 +31,16 @@ export class ToolComponent implements OnInit {
   @Output() removeAllIdentifiersEvent = new EventEmitter<void>()
 
   @ViewChildren('translationAreaRef')
-  translationAreaRefs: ElementRef[]
+  translationAreaRefs: QueryList<ElementRef>
 
   @HostBinding('class') classes = ''
   
   fileName: string 
   projectName: string
   originLanguageObs: Observable<string>
-  translateToLanguageObs: Observable<string>
 
+  translateTo: string
+  
   generated: boolean = false
   translated: boolean = false
 
@@ -50,20 +51,23 @@ export class ToolComponent implements OnInit {
     private auth: AuthenticationService,
     private project: ProjectService,
     private router: Router,
-    private borders: BordersService
+    private borders: BordersService,
   ) {
     this.originLanguageObs = this.language
-    .getOriginObs().pipe(map((language: Language) => language.name))
+      .getOriginObs().pipe(map((language: Language) => language.name))
     
-    this.translateToLanguageObs = this.language
-    .getTranslateToObs().pipe(map((language: Language) => language.name))
+    this.language.getTranslateToObs().subscribe(l => this.translateTo = l.name)
   }
-
 
   ngOnInit(): void {
     this.fileName = this.project.filename
     this.projectName = this.project.project.name
-    // this.template.unselect()
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes.originTexts.firstChange && changes.originTexts.currentValue.length > 0) { 
+      setTimeout(() => this.translationAreaRefs.first.nativeElement.focus(), 100)
+    }
   }
 
   // LEFT BAR
@@ -73,19 +77,22 @@ export class ToolComponent implements OnInit {
   }
 
   async onAddTranslation() {
-    let translations: string[] = this.translationAreaRefs
-      .map(t => t.nativeElement.innerText.replace(/\n/g, ''))
-    translations = this.fillSpacesIfNeeds(translations)
-    console.log(translations)
-    try {
-      let filled = translations.every(t => !!t)
-      if (!filled) throw new Error('Fill in all translation fields')
-      await this.template.setTranslation(translations)
-      this.dialog.setDialogOnlyHeader('Succesfull')
-      this.template.setAsTranslated(this.identifier)
-      this.onUnselect()
-    } catch (error) { 
-      this.dialog.setDialogOnlyHeader(error.message)
+    if (this.identifier) { 
+      let translations: string[] = this.translationAreaRefs
+        .map(t => t.nativeElement.innerText.replace(/\n/g, ''))
+      translations = this.fillSpacesIfNeeds(translations)
+      console.log(translations)
+      try {
+        let filled = translations.every(t => !!t.trim())
+        console.log(filled)
+        if (!filled) throw new Error('Fill in all translation fields')
+        await this.template.setTranslation(translations)
+        this.dialog.setDialogOnlyHeader('Succesfull')
+        this.template.setAsTranslated(this.identifier)
+        this.onUnselect()
+      } catch (error) { 
+        this.dialog.setDialogOnlyHeader(error.message)
+      }
     }
   }
 
@@ -166,6 +173,18 @@ export class ToolComponent implements OnInit {
   onOriginDownload() { this.project.downloadOriginFile(this.project.name) }
   
   onLogout(): void { this.auth.logout() }
+
+  
+  // KEYBOARD
+
+  @HostListener('window:keyup', ['$event.key'])
+  keyEvent(key: string): void {
+    if (key === 'Enter') {
+      if (!this.dialog.active && !!this.translateTo && this.identifier) {
+        this.onAddTranslation()
+      }
+    }
+  }
 
 
   // OTHERS

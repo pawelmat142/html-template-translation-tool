@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { TemplateComponent } from 'src/app/components/template/template.component';
-import { TemplateService } from 'src/app/services/template.service';
+import { Component } from '@angular/core';
+import { FileService } from 'src/app/services/file.service';
 
 // MAIN VIEW AFTER AUTHORIZATION - CONTAINS TEMPLATE AND TOOLS
 
@@ -10,5 +9,10 @@ import { TemplateService } from 'src/app/services/template.service';
   styleUrls: ['./main.component.css']
 })
 export class MainComponent {
-  constructor( ) { }
+
+  constructor() { 
+  }
+
+  originTexts: string[]
+
 }

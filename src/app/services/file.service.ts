@@ -12,6 +12,7 @@ export class FileService {
   getTemplateConentObs() { return this.templateConentObs.asObservable() }
   
   private file: File
+  css: string = ''
   private fileAsString: string
 
   private top: string
@@ -23,6 +24,10 @@ export class FileService {
   triggerInitTemplate() { 
     console.log('triggerInitTemplate')
     this.templateConentObs.next(this.getTemplateConent())
+  }
+
+  async setCss(file: File) { 
+    this.css = await file.text()
   }
 
   async initFile(file: File): Promise<void> {
@@ -61,10 +66,11 @@ export class FileService {
   }
 
   generateTemplate(ref: HTMLElement, language: Language): void {
+    const top = this.translatedTop(language)
     const bodyTag = this.fileAsString.match(/<body[^>]*>/gi).pop()
-    let head = ref.innerHTML.split(SEPARATOR).shift()
-    let body = ref.innerHTML.split(SEPARATOR).pop()
-    let fileAsTxt = `${this.top}\n<head>\n${head}\n</head>\n${bodyTag}\n${body}\n</body>`
+    const head = ref.innerHTML.split(SEPARATOR).shift()
+    const body = ref.innerHTML.split(SEPARATOR).pop()
+    let fileAsTxt = `${top}\n<head>\n${head}\n</head>\n${bodyTag}\n${body}\n</body>`
 
     const filename = this.file.name.split('.')[0] + '_' + language.code + '.html'
     
@@ -76,8 +82,16 @@ export class FileService {
     this.download(translatedFile)
   }
 
+  private translatedTop(language: Language): string {
+    const index = this.top.indexOf('lang="')
+    if(!index) throw new Error('lang attribute changing error')
+    const slice = this.top.slice(index, index+9)
+    return this.top.replace(slice, `lang="${language.code}"`)
+  }
+
   clear(): void {
     this.file = null
+    this.css = ''
     this.fileAsString = ''
     this.top = ''
     this.head = ''

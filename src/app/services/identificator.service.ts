@@ -28,20 +28,17 @@ export class IdentificatorService {
   templateReference: HTMLElement
 
   constructor(
+    private language: LanguagesService,
     private db: DataService,
     private dialog: DialogService,
-    private language: LanguagesService,
   ) { console.log('identificator init') }
 
-  // loadElements(elements: TranslationElement[]): void {
-  //   this.translationElements = elements
-  // }
 
   identify(contentToIdentify: Node, translationElements: TranslationElement[]): TranslationElement[] { 
     this.translationElements = translationElements
     this.identifyHead(contentToIdentify as HTMLElement)
-    this.identifyLoop(contentToIdentify)
     this.identifyImages()
+    this.identifyLoop(contentToIdentify)
     return this.translationElements
   }
 
@@ -67,7 +64,7 @@ export class IdentificatorService {
       let identifier = parentElement.getAttribute('identifier')
       if (identifier) {
         let elem: TranslationElement = this.translationElements
-          .find(el => el.identifier === identifier)
+        .find(el => el.identifier === identifier)
         if (!elem[this.language.origin].includes(txtToTranslate)) { 
           elem[this.language.origin].push(txtToTranslate)
         }

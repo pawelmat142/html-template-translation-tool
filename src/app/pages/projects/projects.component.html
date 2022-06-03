@@ -8,6 +8,7 @@
         <div class="myrow head">
             <p>PROJECT:</p>
             <p>FILENAME:</p>
+            <p>CSS:</p>
             <p>ORIGIN LANGUAGE:</p>
             <p>MODIFIED:</p>
             <p>TIME:</p>
@@ -16,6 +17,20 @@
         <div class="myrow" *ngFor="let project of userProjectsObs | async">
             <p>{{project.name}}</p>
             <p>{{project.filename}}</p>
+
+            <div *ngIf="project.cssName" class="cssButtons">
+                <div class="mybtn center trans">
+                    <button (click)="onAddCss(project)">{{project.cssName}}</button>
+                </div>
+                <div class="mybtn center red">
+                    <button (click)="onDelCss(project)">del</button>
+                </div>
+            </div>
+
+            <div class="mybtn center w50" *ngIf="!project.cssName">
+                <button (click)="onAddCss(project)">add</button>
+            </div>
+
             <p>{{project.originLanguage}}</p>
             <p>{{project.modified.split(' ').shift()}}</p>
             <p>{{project.modified.split(' ').pop()}}</p>
@@ -37,6 +52,14 @@
             <label>file name:</label>
             <p class="myinput" disabled>{{filenameAdding || "Choose file ..."}}</p>
         </div>
+        
+        <div>
+            <label>css file (optional):</label>
+            <div class="file-input-container">
+                <p class="myinput">{{cssFilenameAdding || "Choose file ..."}}</p>
+                <input type="file" class="myinput" (change)="onCssFileSelected($event)" >
+            </div>
+        </div>
         <div>
             <label>project name:</label>
             <input type="text" placeholder="set project name..." [(ngModel)]="input">
@@ -53,20 +76,27 @@
         </div>
     </div>
     
-    <div class="file-input-container">
-        <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
-    </div>
+
+    <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
 
 
-    <div class="mybtn center">
-        <button 
-        (click)="inputOpen ? rejectAddingProject() : fileUpload.click()" 
-        [innerHTML]="inputOpen ? 'REJECT' : 'ADD NEW PROJECT'"
-        ></button>
-    </div>
+    <div class="buttons">
+        
+        <div class="mybtn center">
+            <button 
+            (click)="inputOpen ? rejectAddingProject() : fileUpload.click()" 
+            [innerHTML]="inputOpen ? 'REJECT' : 'ADD NEW PROJECT'"
+            ></button>
+        </div>
+    
+        <div class="mybtn center">
+            <button (click)="logout()">LOGOUT</button>
+        </div>
+    
+        <div class="mybtn center red">
+            <button (click)="deleteAccount()">delete account</button>
+        </div>
 
-    <div class="mybtn center">
-        <button (click)="logout()">LOGOUT</button>
     </div>
 
 </div>

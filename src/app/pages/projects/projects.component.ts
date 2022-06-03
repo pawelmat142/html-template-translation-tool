@@ -1,13 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthenticationService } from 'src/app/services/authentication.service';
 import { DataService } from 'src/app/services/data.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { DialogService } from 'src/app/services/dialog.service';
 import { Collection } from '../../models/collection';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { Observable } from 'rxjs'
-import { FileService } from 'src/app/services/file.service';
 
 @Component({
   selector: 'app-projects',
@@ -17,13 +15,12 @@ import { FileService } from 'src/app/services/file.service';
 export class ProjectsComponent {
 
   filenameAdding: string = ''
-  fileForNewProject: File
+  cssFilenameAdding: string = ''
   languages: string[]
 
   userProjectsObs: Observable<Collection[]>
 
   constructor(
-    private auth: AuthenticationService,
     private service: ProjectService,
     private db: DataService,
     private dialog: DialogService,
@@ -36,7 +33,7 @@ export class ProjectsComponent {
 
   inputOpen: boolean = false
   input: string = ''
-  @ViewChild('languageRef') languageRef
+  @ViewChild('languageRef') languageRef: ElementRef
 
 
   async onFileSelected(event: any) {
@@ -47,6 +44,38 @@ export class ProjectsComponent {
       this.filenameAdding = file.name
       this.inputOpen = true
       this.service.fileForNewProject = file
+    } catch (error) {this.dialog.setDialogOnlyHeader(error.message)}
+  }
+
+  onAddCss(project: Collection) {
+    const input: HTMLInputElement = document.createElement('input')
+    input.type = 'file'
+    input.onchange = () => this.addCssFile(project.name, input.files[0])
+    input.click()
+  }
+
+  async onDelCss(project: Collection) {
+    try { 
+      await this.service.deleteCssFile(project.name)
+      this.dialog.setDialogOnlyHeader('CSS file removed!')
+    } catch (error) {this.dialog.setDialogOnlyHeader(error.message)}
+  }
+
+  async addCssFile(projectName, file: File) { 
+    try {
+      if (!this.cssFile(file)) throw new Error('file has to be CSS!')
+      await this.service.addCssFile(projectName, file)
+      this.dialog.setDialogOnlyHeader('CSS file added')
+    } catch (error) {this.dialog.setDialogOnlyHeader(error.message)}
+  }
+
+
+  async onCssFileSelected(event: any) {
+    let file = event.target.files[0] as File
+    try { 
+      if (!this.cssFile(file)) throw new Error('file has to be CSS!')
+      this.cssFilenameAdding = file.name
+      this.service.cssFileForNewProject = file
     } catch (error) {this.dialog.setDialogOnlyHeader(error.message)}
   }
 
@@ -63,6 +92,7 @@ export class ProjectsComponent {
       let newCollection: Collection = {
         name: this.input,
         filename: this.filenameAdding,
+        cssName: '',
         modified: new Date().toLocaleDateString() +
           ' ' + new Date().toLocaleTimeString(),
         originLanguage: this.languageRef.nativeElement.value
@@ -83,15 +113,26 @@ export class ProjectsComponent {
   }
     
   logout(): void {
-    this.auth.logout()
+    this.service.logout()
+  }
+  
+  async deleteAccount() {
+    await this.dialog.confirmDialog('Are you sure?!', 'Account and all data will be deleted.')
+    this.service.deleteAccount()
   }
 
   private htmlFile(file: File): boolean {
     if (file.name.split('.').pop() === 'html') {
       return true
-    } else { 
-      return false
-    }
+    } else return false
   }
+
+  private cssFile(file: File): boolean {
+    if (file.name.split('.').pop() === 'css') {
+      return true
+    } else return false
+  }
+
+  private wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
 
 }

@@ -118,7 +118,6 @@ export class TemplateService {
     
   // identificator
   identify(content: Node): void {
-    console.log(this.translationElements)
     let newElements = this.identificator
       .identify(content, this.translationElements)
     this.translationElements.push(...newElements)

@@ -21,6 +21,14 @@ export class DialogService {
     txt: [],
   }
 
+  get active(): boolean {
+    return this.dialog.open
+  }
+
+  set active(a: boolean) {
+    this.dialog.open = a
+  }
+
   private dialogObs = new BehaviorSubject<any>(this.dialog)
 
   constructor(private language: LanguagesService) {
@@ -31,11 +39,11 @@ export class DialogService {
     return this.dialogObs.asObservable()
   }
 
-  open() { 
+  open() {
     this.dialog.open = true
     this.dialogObs.next(this.dialog)
   }
-
+  
   close() { 
     this.dialog.open = false
     this.dialogObs.next(null)
@@ -60,7 +68,7 @@ export class DialogService {
     this.dialog.confirmFunction = null
   }
 
-  promise: Promise<void>
+  private promise: Promise<void>
 
   confirmDialog(header: string, text?: string) {
     this.promise = new Promise((resolve) => {

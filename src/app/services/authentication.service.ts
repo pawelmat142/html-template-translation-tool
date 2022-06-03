@@ -58,12 +58,6 @@ export class AuthenticationService {
     try { 
       let result = await this.fireauth
         .createUserWithEmailAndPassword(email, password)
-        
-      // let r = await this.firestore
-      //   .collection(result.user.uid)
-      //   .doc()
-      //   .set({})
-      
       this.router.navigate(['login'])
       return true
     } catch (error) { return error }
@@ -78,6 +72,15 @@ export class AuthenticationService {
     catch (error) { 
       console.log(error)
       return false
+    }
+  }
+
+  async deleteAccount() { 
+    try {
+      await this.user.delete()
+    }
+    catch (error) { 
+      await this.fireauth.signOut()
     }
   }
 

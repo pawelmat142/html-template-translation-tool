@@ -185,8 +185,13 @@ input {
     width: 100%;
 }
 
-.mybtn.min button{
+.mybtn.min button {
     min-width: 70px;
+}
+
+.mybtn.trans button {
+    background-color: transparent;
+    color: #000;
 }
 
 .mybtn button:not([disabled]):hover {
