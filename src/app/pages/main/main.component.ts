@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ManualComponent } from 'src/app/components/manual/manual.component';
 
-// MAIN VIEW AFTER AUTHORIZATION - CONTAINS TEMPLATE AND TOOLS
+// MAIN VIEW - CONTAINS LOADED PROJECT TEMPLATE AND TOOLS
 
 @Component({
   selector: 'app-main',
@@ -13,7 +13,6 @@ export class MainComponent {
   constructor() { }
 
   originTexts: string[]
-
 
 
   // MANUAL COMPONENT

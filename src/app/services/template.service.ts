@@ -8,8 +8,7 @@ import { LanguagesService } from './languages.service';
 import { ProjectService } from './project.service';
 import { TranslatorService } from './translator.service';
 
-// STORES AND MODIFY CURRENT LOADED TEMPLATE VIEW
-// - borders blue/orange = identified/translated
+// STORES AND MODIFY TRANSLATION ELEMENTS ARRAY
 
 @Injectable({
   providedIn: 'root'
@@ -106,6 +105,7 @@ export class TemplateService {
   }
   
   async translateTemplate(translated: boolean): Promise<boolean> {
+    this.translator.setReference(this._reference)
     this.translator.set(this.translationElements)
     return await this.translator.translateTemplate(translated)
   }

@@ -1,22 +1,22 @@
 
-<div class="dialog mycontainer">
+<div class="htt-dialog htt-mycontainer">
 
-    <h1 *ngIf="d.header">{{d.header}}</h1>
+    <h1 class="htt" *ngIf="d.header">{{d.header}}</h1>
     
     <p *ngFor="let text of d.txt">{{text}}</p>
     
-    <div class="mybtn full">
+    <div class="htt-mybtn full">
         <button *ngIf="d.confirmFunction" (click)="d.confirmFunction(); close()">CONFIRM</button>
     </div>
     
     <ng-container *ngIf="purpose === 'language'">
-        <div *ngFor="let lang of languages; index as index" class="mybtn full">
+        <div *ngFor="let lang of languages; index as index" class="htt-mybtn full">
             <button (click)="setLanguage(lang); close()">{{lang}}</button>
         </div>
     </ng-container>
     
-    <div class="mybtn red full">
-        <button (click)="close()" class="close">CLOSE</button>
+    <div class="htt-mybtn red full">
+        <button (click)="close()" class="htt-close">CLOSE</button>
     </div>
 
 </div>

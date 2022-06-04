@@ -1,19 +1,19 @@
 <!-- LEFT BAR -->
 
-<div class="left tool-bg">
+<div class="htt-left htt-tool-bg">
     
-    <div *ngIf="originTexts && originTexts.length" class="areas">
+    <div *ngIf="originTexts && originTexts.length" class="htt-areas">
         <ng-container *ngFor="let text of originTexts; index as index">
 
-            <div class="textarea-wrapper">
-                <p class="origin textarea">{{text}}</p>
+            <div class="htt-textarea-wrapper">
+                <p class="htt-origin htt-textarea">{{text}}</p>
             </div>
 
-            <div class="textarea-wrapper">
+            <div class="htt-textarea-wrapper">
                 <span
                     (keydown)="$event.key === 'Enter' ? $event.preventDefault() : ''"
                     contenteditable
-                    class="textarea" 
+                    class="htt-textarea" 
                     role="textbox"
                     #translationAreaRef
                 >{{translateToTexts[index]}}</span>
@@ -22,25 +22,25 @@
         </ng-container>
     </div>
     
-    <div class="identifier cont">
-        <p class="title">IDENTIFIER:</p>
-        <p class="text-field">{{identifier || "none..." }}</p>
-        <div class="mybtn full red">
+    <div class="htt-identifier htt-cont">
+        <p class="htt-title">IDENTIFIER:</p>
+        <p class="htt-text-field">{{identifier || "none..." }}</p>
+        <div class="htt-mybtn full red">
             <button 
                 (click)="removeIdentifier()"
                 [disabled]="!identifier"
             >remove</button>
         </div>
-        <div class="mybtn full">
+        <div class="htt-mybtn full">
             <button 
                 (click)="onAddTranslation()" 
                 [disabled]="!(translateTo)"
             >ADD TRANSLATION</button>
         </div>
-        <div class="mybtn red full">
+        <div class="htt-mybtn red full">
             <button (click)="onUnselect()" [disabled]="!identifier">unselect</button>
         </div>
-        <div class="mybtn red full">
+        <div class="htt-mybtn red full">
             <button
                 (click)="removeTranslation()" 
                 [disabled]="!identifier || !(translateTo)"
@@ -52,84 +52,84 @@
 
 <!-- BOTTOM BAR -->
 
-<div class="bottom tool-bg" (mouseenter)="classes='hover'" (mouseleave)="classes=''">
+<div class="htt-bottom htt-tool-bg" (mouseenter)="classes='htt-hover'" (mouseleave)="classes=''">
 
-    <div class="myrow">
+    <div class="htt-myrow">
         
         <div>
-            <p class="title">project:</p>
-            <p class="filename text-field">{{projectName || "No project..."}}</p>
+            <p class="htt-title">project:</p>
+            <p class="htt-filename htt-text-field">{{projectName || "No project..."}}</p>
         </div>
 
         <div>
-            <p class="title">filename:</p>
-            <p class="filename text-field">{{fileName || "No file..."}}</p>
+            <p class="htt-title">filename:</p>
+            <p class="htt-filename htt-text-field">{{fileName || "No file..."}}</p>
         </div>
 
-        <div class="langs">
-            <div class="title">LANGUAGES</div>
-            <div class="mybtn min blue">
+        <div class="htt-langs">
+            <div class="htt-title">LANGUAGES</div>
+            <div class="htt-mybtn min blue">
                 <button disabled>from:</button>
             </div>
-            <p class="text-field">{{(originLanguageObs | async | tittlecase)  || "none..." }}</p>
-            <div class="mybtn min blue">
+            <p class="htt-text-field">{{(originLanguageObs | async | tittlecase)  || "none..." }}</p>
+            <div class="htt-mybtn min blue">
                 <button (click)="onChooseLanguage()">to:   </button>
             </div>
-            <p class="text-field">{{(translateTo | tittlecase)  || "none..." }}</p>
+            <p class="htt-text-field">{{(translateTo | tittlecase)  || "none..." }}</p>
         </div>
         
-        <div class="right"> 
-            <div class="mybtn green">
+        <div class="htt-right"> 
+            <div class="htt-mybtn green">
                 <button (click)="openManualEvent.emit()">!?! MANUAL !?!</button>
             </div>
-            <div class="mybtn blue">
+            <div class="htt-mybtn blue">
                 <button (click)="onBorders()">borders</button>
             </div>
-            <div class="mybtn blue">
+            <div class="htt-mybtn blue">
                 <button (click)="autoIdentify()">AUTO IDENTIFY</button>
             </div>
         </div>
 
     </div>
 
-    <div class="hidden-row">
+    <div class="htt-hidden-row">
 
         <div>
-            <div class="mybtn blue">
+            <div class="htt-mybtn blue">
                 <button (click)="saveTemplate()" [disabled]="generated">SAVE TEMPLATE</button>
             </div>
-            <div class="mybtn blue">
+            <div class="htt-mybtn blue">
                 <button (click)="translateImages()" [disabled]="!(translateTo)">add img translations</button>
             </div>
-            <div class="mybtn blue">
+            <div class="htt-mybtn blue">
                 <button (click)="translateHead()" [disabled]="!(translateTo)">add head translations</button>
             </div>
-            <div class="mybtn green">
+            <div class="htt-mybtn green">
                 <button (click)="untranslated()" [disabled]="!(translateTo)">untranslated</button>
             </div>
-            <div class="mybtn">
+            <div class="htt-mybtn">
                 <button 
                     (click)="translateTemplate()" 
                     [disabled]="!(translateTo)"
                     [innerHTML]="translated ? 'BACK TO ORIGIN' : 'TRANSLATE TEMPLATE'"
                 ></button>
             </div>
-            <div class="mybtn blue">
+            <div class="htt-mybtn blue">
                 <button (click)="generateTemplate()" [disabled]="!(translateTo)">GENERATE TEMPLATE</button>
             </div>
         </div>
 
         <div>
-            <div class="mybtn red">
+            <div class="htt-mybtn red">
                 <button (click)="removeAllIdentifiers()">remove all identifiers</button>
             </div>
-            <div class="mybtn blue">
+            <div class="htt-mybtn blue">
                 <button (click)="onOriginDownload()">download origin file</button>
             </div>
-            <div class="mybtn red">
+            <div class="htt-mybtn red">
                 <button (click)="onLeave()">PROJECTS</button>
             </div>
-            <div class="mybtn red">
+            <div class="htt-mybtn red">
                 <button (click)="onLogout()">LOGOUT</button>
             </div>
         </div>

@@ -5,6 +5,8 @@ import { DialogService } from './dialog.service';
 import { LanguagesService } from './languages.service';
 import { ReportService } from './report.service';
 
+// TEMPLATE TRANSLATION LOGIC
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,6 +21,8 @@ export class TranslatorService {
   private textsToTranslate: string[]
   private textsTranslated: string[]
 
+  private reference: HTMLElement
+
   constructor(
     private language: LanguagesService,
     private report: ReportService,
@@ -28,6 +32,9 @@ export class TranslatorService {
 
   set(arr: TranslationElement[]): void {
     this.translationElements = arr;
+  }
+  setReference(ref: HTMLElement) { 
+    this.reference = ref
   }
   clearElements(): void {
     this.translationElements = []
@@ -62,7 +69,7 @@ export class TranslatorService {
 
       this.textsToTranslate.push(e[this.from])
 
-      const elem: HTMLElement = document
+      const elem: HTMLElement = this.reference
         .querySelector(`[identifier="${e.identifier}"]`)
       
       if (elem) { 
@@ -129,6 +136,7 @@ export class TranslatorService {
         if (a && a.tagName.toLocaleLowerCase() === 'meta') {
           elementsToTranslate.push(el)
           this.report.elements = elementsToTranslate
+          this.report.purpose = 'headElements'
           this.router.navigate(['report'])
         }
       })
@@ -151,6 +159,7 @@ export class TranslatorService {
     })
     if (elementsToTranslate.length > 0) {
       this.report.elements = elementsToTranslate
+      this.report.purpose = 'imgElements'
       this.router.navigate(['report'])
     } else { 
       this.dialog.setDialogOnlyHeader('No more img alts to translate')
@@ -161,8 +170,9 @@ export class TranslatorService {
     this.setLanguages()
     let notTranslated = this.getElementsWithoutTranslations()
     if (notTranslated && notTranslated.length > 0) {
-        this.report.elements = notTranslated
-        this.router.navigate(['report'])
+      this.report.elements = notTranslated
+      this.report.purpose = 'untranslated'
+      this.router.navigate(['report'])
     } else { 
       this.dialog.setDialogOnlyHeader('All elements are translated')
     }

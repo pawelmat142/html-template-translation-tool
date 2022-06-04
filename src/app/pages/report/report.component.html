@@ -1,40 +1,58 @@
-<div class="mycontainer">
+<div class="htt-mycontainer">
 
-    <h3>REPORT</h3>
+    <ng-container *ngIf="purpose === 'imgElements'">
+        <h3 class="htt">IMAGES ALT's</h3>
+        <p class="htt-explanation">
+            These elements have been identified as images that need to be translated. 
+            For each of them, you must enter a translation or remove the Identifier. 
+            This list should be empty before you translate the template.
+        </p>
+        <h4 class="htt">Identified elements without translations:</h4>
+    </ng-container>
 
-    <ng-container *ngIf="purpose === 'notIdentifiedElements'">
-        <p class="explanation">These elements have been identified as texts that need to be translated. 
-            You can add these translations now. If you want to omit their translations, remove the identifiers.
-            You can also go back to the template view. 
-            It is not recommended to translate a template with elements not translated but with identifiers.
+    <ng-container *ngIf="purpose === 'headElements'">
+        <h3 class="htt">HEAD META</h3>
+        <p class="htt-explanation">
+            These elements have been identified as metadatas that need to be translated. 
+            For each of them, you must enter a translation or remove the Identifier. 
             This list should be empty before you translate the template
         </p>
-        <h4>Identified elements without translations:</h4>
+        <h4 class="htt">Identified elements without translations:</h4>
+    </ng-container>
+
+    <ng-container *ngIf="purpose === 'untranslated'">
+        <h3 class="htt">REPORT</h3>
+        <p class="htt-explanation">
+            These elements have been identified but have not been translated yet.
+            For each of them, you must enter a translation or remove the Identifier. 
+            This list should be empty before you translate the template
+        </p>
+        <h4 class="htt">Identified elements without translations:</h4>
     </ng-container>
 
 
-    <div class="elements">
+    <div class="htt-elements">
 
-        <div class="myrow head">
+        <div class="htt-myrow head">
             <p>IDENTIFIER:</p>
             <p>TEXTS:</p>
         </div>
 
-        <div *ngFor="let el of elements" class="group">
-            <div class="myrow" *ngFor="let text of el[originLanguage]; index as index">
+        <div *ngFor="let el of elements" class="htt-group">
+            <div class="htt-myrow" *ngFor="let text of el[originLanguage]; index as index">
                 <p>{{index===0 ? el.identifier : '...'}}</p>
                 <p>{{text}}</p>
                 <textarea
-                    class="myinput"
+                    class="htt-myinput"
                     type="text" 
                     placeholder="translation..." 
                     (keyup)="0" 
                     [(ngModel)]="el[translateTo][index]"
                 ></textarea>
-                <div class="mybtn" *ngIf="index === 0">
+                <div class="htt-mybtn" *ngIf="index === 0">
                     <button (click)="addTranslation(el)" [disabled]="isDisabled(el[translateTo])">translate</button>
                 </div>
-                <div class="mybtn red" *ngIf="index === 0">
+                <div class="htt-mybtn red" *ngIf="index === 0">
                     <button (click)="removeIdentifier(el.identifier)" type="button">remove</button>
                 </div>
             </div>
@@ -42,7 +60,7 @@
 
     </div>
 
-    <div class="languages">
+    <div class="htt-languages">
         <div>
             <p>origin language:</p>
             <p>{{originLanguage}}</p>
@@ -53,7 +71,7 @@
         <p></p>
     </div>
 
-    <div class="mybtn center">
+    <div class="htt-mybtn center">
         <button (click)="goBack()">GO BACK</button>
     </div>
 </div>

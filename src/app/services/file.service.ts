@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Language } from '../models/language';
+
+// STORES CURRENT PROJECT HTML FILE AND OPTIONAL CSS FILE
+
 const SEPARATOR = '<!-- separator -->'
 
 @Injectable({
@@ -44,7 +47,7 @@ export class FileService {
     this.body = this.fileAsString.match(/<body[^>]*>[\s\S]*<\/body>/gi).pop()
   }
 
-  private getTemplateConent(): string {
+  getTemplateConent(): string {
     return this.head + '\n'+ SEPARATOR + '\n' + this.body
   }
 

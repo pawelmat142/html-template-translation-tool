@@ -1,5 +1,5 @@
 <form 
-    class="form one mycontainer"
+    class="htt one htt-mycontainer"
     [formGroup]="registerForm" 
     (ngSubmit)="onSubmit()" 
     (keyup.escape)="registerForm.reset()"
@@ -9,33 +9,33 @@
 
     <div>
         <label>Email</label>
-        <input type="email" formControlName="email" autocomplete="off">
+        <input class="htt-myinput" type="email" formControlName="email" autocomplete="off">
     </div>
 
     <div>
         <label>Email repeat</label>
-        <input type="email" formControlName="confirmEmail" autocomplete="off">
+        <input class="htt-myinput" type="email" formControlName="confirmEmail" autocomplete="off">
     </div>
 
     <div>
         <label>Password</label>
-        <input type="password" formControlName="password" autocomplete="off">
+        <input class="htt-myinput" type="password" formControlName="password" autocomplete="off">
     </div>
 
     <div>
         <label>Password repeat</label>
-        <input type="password" formControlName="confirmPassword" autocomplete="off">
+        <input class="htt-myinput" type="password" formControlName="confirmPassword" autocomplete="off">
     </div>
 
-    <div class="mybtn full">
+    <div class="htt-mybtn full">
         <button [disabled]="registerForm.invalid">Register</button>
     </div>
     
-    <div class="mybtn full">
+    <div class="htt-mybtn full">
         <button type="button" [routerLink]="['/login']">back</button>
     </div>
         
 
-    <p class="message red" *ngIf="errorMsg">{{errorMsg}}</p>
-    <p class="message" *ngIf="message">{{message}}</p>
+    <p class="htt-message red" *ngIf="errorMsg">{{errorMsg}}</p>
+    <p class="htt-message" *ngIf="message">{{message}}</p>
 </form>

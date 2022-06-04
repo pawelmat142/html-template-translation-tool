@@ -1,5 +1,5 @@
 <form 
-    class="form one mycontainer"
+    class="htt one htt-mycontainer"
     [formGroup]="loginForm" 
     (ngSubmit)="onSubmit()" 
     (keyup.escape)="loginForm.reset()"
@@ -9,29 +9,29 @@
 
     <div>
         <label>Email</label>
-        <input type="email" formControlName="email">
+        <input class="htt-myinput" type="email" formControlName="email">
     </div>
 
     <div>
         <label>Password</label>
-        <input type="text" formControlName="password">
+        <input class="htt-myinput" type="text" formControlName="password">
     </div>
 
-    <div class="mybtn full">
+    <div class="htt-mybtn full">
         <button [disabled]="loginForm.invalid">Login</button>
     </div>
 
-    <div class="mybtn full">
+    <div class="htt-mybtn full">
         <button type="button" [routerLink]="['/register']">Register</button>
     </div>
 
-    <div class="mybtn full">
-        <button type="button" class="card" (click)="googleLogin()">
-            <img src="../../../assets/img/icon-google.png" alt="icon google">
+    <div class="htt-mybtn full">
+        <button type="button" class="htt-card" (click)="googleLogin()">
+            <img class="htt" src="../../../assets/img/icon-google.png" alt="icon google">
             <p>Login with Google</p>
         </button>
     </div>
 
-    <p class="message red" *ngIf="errorMsg">{{errorMsg}}</p>
-    <p class="message" *ngIf="message">{{message}}</p>
+    <p class="htt-message red" *ngIf="errorMsg">{{errorMsg}}</p>
+    <p class="htt-message" *ngIf="message">{{message}}</p>
 </form>

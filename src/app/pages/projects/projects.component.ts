@@ -6,6 +6,9 @@ import { DialogService } from 'src/app/services/dialog.service';
 import { Collection } from '../../models/collection';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { Observable } from 'rxjs'
+import { GeneratorService } from 'src/app/services/generator.service';
+
+// USER PROJECTS MANAGMENT
 
 @Component({
   selector: 'app-projects',
@@ -26,6 +29,7 @@ export class ProjectsComponent {
     private dialog: DialogService,
     private router: Router,
     private language: LanguagesService,
+    private generator: GeneratorService
   ) { 
     this.languages = this.language.list
     this.userProjectsObs = this.db.getUserProjectsObs()
@@ -34,6 +38,8 @@ export class ProjectsComponent {
   inputOpen: boolean = false
   input: string = ''
   @ViewChild('languageRef') languageRef: ElementRef
+
+  generateButtonInner = 'generate'
 
 
   async onFileSelected(event: any) {
@@ -105,6 +111,17 @@ export class ProjectsComponent {
 
   onDelete(project: Collection): void {
     this.service.deleteProject(project.name)
+  }
+
+  onGenerate(project: Collection): void {
+    if (!this.language.translateTo) {
+      this.dialog.clearDialog()
+      this.dialog.purpose = 'language'
+      this.dialog.open()
+    } else {
+      console.log('generate')
+      this.generator.generate(project)
+    }
   }
 
   async onSetProject(project: Collection) {

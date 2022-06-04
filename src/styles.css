@@ -63,7 +63,7 @@ a {
 
 
 /* FORMS */
-form.one {
+form.htt.one {
     margin: 10vh auto 0;
     padding: 2em 1.5em;
     width: 350px;
@@ -74,25 +74,25 @@ form.one {
     color: #212529;
 }
 
-form.one > h1 {
+form.htt.one > h1 {
     color: #1a73e8;
     text-align: center;
     font-weight: bold;
 }
 
-form.one > div {
+form.htt.one > div {
     display: flex;
     flex-direction: column;
 }
 
-form.one label {
+form.htt.one label {
     font-size: .8em;
     padding-left: 2em;
     padding-bottom: .2em;
     color: #212529c2;
 }
 
-form .message {
+form.htt .htt-message {
     padding-top: 1em;
     text-align: center;
     color: tomato;
@@ -100,7 +100,7 @@ form .message {
     font-weight: bold;
 }
 
-form .card {
+form.htt .htt-card {
     height: 60px !important;
     display: flex;
     flex-direction: row;
@@ -110,22 +110,22 @@ form .card {
     padding: .5em 2em;
 }
 
-form .card img {
+form.htt .htt-card img {
     height: 50px;
     padding: .5em
 }
 
-form .card p {
+form.htt .htt-card p {
     font-weight: normal;
 }
 
-select {
+select.htt {
     height: 40px;
 }
 
-select,
-.myinput,
-input {
+select.htt,
+.htt-myinput,
+input.htt {
     letter-spacing: .5px;
     min-height: 40px;
     padding: 0 10px;
@@ -137,7 +137,7 @@ input {
     color: #263f5f;
 }
 
-.form.one button {
+.form.htt.one button {
     line-height: 45px;
     margin-top: 7px;
 }
@@ -145,24 +145,24 @@ input {
 
 
 /* 888888888888888888888 */
-.mycontainer {
+.htt-mycontainer {
     background-color: #fafafa;
     border-radius: 8px;
     box-shadow: 0 -1px 0 rgb(0 0 0 / 12%) inset;
     padding: 16px 10px;
 }
 
-.mybtn {
+.htt-mybtn {
     display: flex;
     align-items: center;
     text-align: center;
 }
 
-.mybtn.center {
+.htt-mybtn.center {
     justify-content: center;
 }
 
-.mybtn button {
+.htt-mybtn button {
     background-color: #1a73e8;
     color: #fff;
     min-width: 50px;
@@ -176,25 +176,30 @@ input {
     box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
 }
 
-.mybtn.red button {
+.htt-mybtn.red button {
     background-color: #d50000;
     border: 2px solid #d50000;
 }
 
-.mybtn.full button {
+.htt-mybtn.green button {
+    background-color: #34a853;
+    border: 2px solid #34a853;
+}
+
+.htt-mybtn.full button {
     width: 100%;
 }
 
-.mybtn.min button {
+.htt-mybtn.min button {
     min-width: 70px;
 }
 
-.mybtn.trans button {
+.htt-mybtn.trans button {
     background-color: transparent;
     color: #000;
 }
 
-.mybtn button:not([disabled]):hover {
+.htt-mybtn button:not([disabled]):hover {
     background-color: transparent!important;
     color: #000;
 }
@@ -204,7 +209,7 @@ button[disabled] {
     cursor: not-allowed;
 }
 
-.myinput[disabled],
+.htt-myinput[disabled],
 input[disabled] {
     opacity: .8;
     cursor: not-allowed;

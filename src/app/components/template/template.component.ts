@@ -4,7 +4,7 @@ import { LanguagesService } from 'src/app/services/languages.service';
 import { TranslationElement } from 'src/app/models/translationElement';
 import { FileService } from 'src/app/services/file.service';
 
-// DISPLAY AND MODIFY LOADED TEMPLATE
+// MODIFYING TEMPLATE VIEW
 
 @Component({
   selector: 'app-template',

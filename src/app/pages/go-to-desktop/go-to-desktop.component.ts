@@ -1,15 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-go-to-desktop',
-  templateUrl: './go-to-desktop.component.html',
-  styleUrls: ['./go-to-desktop.component.css']
+  template: '<p>Go to desktop <br>please</p> ',
+  styleUrls: ['./go-to-desktop.component.css'],
 })
-export class GoToDesktopComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
-}
+export class GoToDesktopComponent {}

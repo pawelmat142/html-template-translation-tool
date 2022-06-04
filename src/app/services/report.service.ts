@@ -8,7 +8,7 @@ import { TranslationElement } from '../models/translationElement';
 export class ReportService {
 
   elements: TranslationElement[] = []
-  purpose: string = 'notIdentifiedElements'
+  purpose: string 
 
   constructor() { }
 }

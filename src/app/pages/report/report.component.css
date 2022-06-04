@@ -1,23 +1,23 @@
-.mycontainer {
+.htt-mycontainer {
     margin: 10vh auto 10vh;
     max-width: 95vw;
 }
 
-.explanation {
+.htt-explanation {
     font-size: 1.3em;
     max-width: 80%;
     margin: 0 auto;
     text-align: center;
 }
 
-h3 {
+h3.htt {
     text-align: center;
     margin-bottom: 15px;
     font-weight: bold;
     color: #1a73e8;
 }
 
-h4 {
+h4.htt {
     text-align: center;
     margin-bottom: 20px;
     margin-top: 20px;
@@ -25,7 +25,7 @@ h4 {
     letter-spacing: 1px;
 }
 
-.elements {
+.htt-elements {
     margin-top: 20px;
     border: 1px solid #0000001f;
     border-radius: 6px;
@@ -33,7 +33,7 @@ h4 {
     margin-bottom: 20px;
 }
 
-.elements .myrow {
+.htt-elements .htt-myrow {
     display: grid;
     grid-template-columns: 2fr 5fr 5fr 1fr 1fr;
     align-items: center;
@@ -41,43 +41,43 @@ h4 {
     padding: .3em 0;
 }
 
-.elements .myrow textarea {
+.htt-elements .htt-myrow textarea {
     margin: 3px 0;
     text-align: left;
     height: 100%;
 }
 
-.elements .myrow.head {
+.htt-elements .htt-myrow.head {
     font-weight: bold;
 }
 
-.elements .myrow button {
+.htt-elements .htt-myrow button {
     width: 100%;
     margin: 0 10px;
 }
 
-.elements .myrow > * {
+.htt-elements .htt-myrow > * {
     text-align: center;
 }
 
-.elements .group:nth-child(even) {
+.htt-elements .htt-group:nth-child(even) {
     background-color: #e8e8e8;
 }
 
-.mycontainer > .mybtn {
+.htt-mycontainer > .htt-mybtn {
     margin-top: 20px;
 }
 
-.mycontainer > .mybtn button {
+.htt-mycontainer > .htt-mybtn button {
     min-width: 200px;
 }
 
-.languages > div {
+.htt-languages > div {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.languages > div > p:not(:first-child) {
+.htt-languages > div > p:not(:first-child) {
     font-weight: bold;
 }

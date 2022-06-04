@@ -2,13 +2,13 @@
     height: 99vh;
 }
 
-.tool-bg {
+.htt-tool-bg {
     background-color: var(--dark);
     border-radius: 0;
     box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
 }
 
-.bottom {
+.htt-bottom {
     height: 115px;
     width: 100%;
     z-index: 100;
@@ -19,11 +19,11 @@
     transform: translateY(65px);
 }
 
-:host(.hover) .bottom {
+:host(.htt-hover) .htt-bottom {
     transform: translateY(0);
 }
 
-.bottom .hidden-row {
+.htt-bottom .htt-hidden-row {
     padding: 0 .5em;
     width: 100%;
     height: 50%;
@@ -34,20 +34,20 @@
     gap: 1em;
 }
 
-.bottom .hidden-row > div {
+.htt-bottom .htt-hidden-row > div {
     display: flex;
     align-items: center;
     gap: 1em;
 }
 
-.bottom .myrow {
+.htt-bottom .htt-myrow {
     display: grid;
     grid-template-columns: 3fr 3fr 6fr 5fr;
     column-gap: 1em;
     height: 50px;
 }
 
-.myrow > div { 
+.htt-myrow > div { 
     background-color: var(--darker);
     border-radius: 5px;
     display: flex;
@@ -55,35 +55,35 @@
     padding: 0 .5em;
 }
 
-.title {
+.htt-title {
     color: #ffffff9e;
     letter-spacing: .5px;
     padding-right: 5px;
 }
 
 /* readfile */
-.filename,
-.mybtn {
+.htt-filename,
+.htt-mybtn {
     height: 35px;
     line-height: 30px;
 }
 
-.mybtn button {
+.htt-mybtn button {
     background-color: var(--green);
     border-color: var(--green);
 }
 
-.mybtn.blue button {
+.htt-mybtn.blue button {
     background-color: var(--bluegreen);
     border-color: var(--bluegreen);
 }
 
-.mybtn.red button {
+.htt-mybtn.red button {
     background-color: var(--orange);
     border-color: var(--orange);
 }
 
-.text-field {
+.htt-text-field {
     height: 35px;
     line-height: 35px;
     width: 100%;
@@ -96,12 +96,12 @@
     color: var(--blue);
 }
 
-.langs {
+.htt-langs {
     display: flex;
     gap: .2em;
 }
 
-.right {
+.htt-right {
     display: flex;
     justify-content: flex-end;
     gap: .3em;
@@ -110,7 +110,7 @@
 
 /* LEFT BAR */
 
-.left { 
+.htt-left { 
     /* position: fixed; */
     /* left: 0; */
     /* top: 0; */
@@ -127,14 +127,14 @@
     padding-bottom: 6vh;
 }
 
-.left .identifier {
+.htt-left .htt-identifier {
     display: grid;
     grid-template-columns: 1fr 3fr;
     column-gap: .5em;
     row-gap: .3em;
 }
 
-.areas {
+.htt-areas {
     display: flex;
     flex-direction: column;
     max-height: 70vh;
@@ -142,31 +142,31 @@
     margin-top: 8vh;
 }
 
-.areas::-webkit-scrollbar {
+.htt-areas::-webkit-scrollbar {
     width: 8px;               /* width of the entire scrollbar */
     border-radius: 4px;
 }
 
-.areas::-webkit-scrollbar-track {
+.htt-areas::-webkit-scrollbar-track {
     background: transparent;        /* color of the tracking area */
 }
 
-.areas::-webkit-scrollbar-thumb {
+.htt-areas::-webkit-scrollbar-thumb {
     background-color: var(--morelighter);    /* color of the scroll thumb */
     border-radius: 5px;       /* roundness of the scroll thumb */
     border: 1px solid transparent;  /* creates padding around scroll thumb */
 }
 
-.areas .origin {
+.htt-areas .htt-origin {
     margin-top: 15px;
     background-color: var(--lighter);
 }
 
-.textarea-wrapper {
+.htt-textarea-wrapper {
     display: inline-table;
 }
 
-.textarea {
+.htt-textarea {
     user-select: auto;
     margin-top: 3px;
     min-height: 5vh;
@@ -186,17 +186,17 @@
 }
 
 
-.textarea[disabled] {
+.htt-textarea[disabled] {
     background-color: var(--lighter);
 }
 
 /* left bottom */
-.cont {
+.htt-cont {
     background-color: var(--darker);
     border-radius: 0.3em;
     padding: .4em .5em;
 }
 
-.mybtn button:hover {
+.htt-mybtn button:hover {
     color: #fff;
 }

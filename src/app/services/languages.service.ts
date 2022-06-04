@@ -7,7 +7,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 })
 export class LanguagesService {
 
-  // STORES DATA ABOUT CURRENT TEMPLATE LANGUAGE AND WHICH LANGUAGE TRANSLATE TO
+  // STORES DATA ABOUT ORIGIN TEMPLATE LANGUAGE AND WHICH LANGUAGE TRANSLATE TO
   
   private langs: Language[] = [
     {
@@ -95,7 +95,6 @@ export class LanguagesService {
     else throw new Error('lang code not found!')
   }
 
-
   get translateTo(): string { 
     return this._translateTo.name
   }
@@ -115,13 +114,16 @@ export class LanguagesService {
 
   set translateTo(name: string) { 
     if (this.list.includes(name)) {
-      // if (name === this.origin) this.dialog.setDialogOnlyHeader('Select a language other than origin')
-      // else { 
-        const lang = this.langs.find(l => l.name === name) as Language
-        this._translateTo = lang
-        this.translateToObs.next(lang)
-      // }
+      const lang = this.langs.find(l => l.name === name) as Language
+      this._translateTo = lang
+      this.translateToObs.next(lang)
     } else throw new Error('no such language')
+  }
+  
+  
+  reset(): void {
+    this._translateTo = this.initial
+    this.translateToObs.next(this.initial)
   }
 
 }

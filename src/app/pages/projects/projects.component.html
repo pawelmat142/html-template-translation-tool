@@ -1,11 +1,11 @@
 
-<div class="mycontainer">
+<div class="htt-mycontainer">
 
     <h3>SELECT PROJECT:</h3>
 
-    <div class="projects">
+    <div class="htt-projects">
 
-        <div class="myrow head">
+        <div class="htt-myrow head">
             <p>PROJECT:</p>
             <p>FILENAME:</p>
             <p>CSS:</p>
@@ -14,64 +14,67 @@
             <p>TIME:</p>
         </div>
 
-        <div class="myrow" *ngFor="let project of userProjectsObs | async">
+        <div class="htt-myrow" *ngFor="let project of userProjectsObs | async">
             <p>{{project.name}}</p>
             <p>{{project.filename}}</p>
 
-            <div *ngIf="project.cssName" class="cssButtons">
-                <div class="mybtn center trans">
+            <div *ngIf="project.cssName" class="htt-cssButtons">
+                <div class="htt-mybtn center trans">
                     <button (click)="onAddCss(project)">{{project.cssName}}</button>
                 </div>
-                <div class="mybtn center red">
+                <div class="htt-mybtn center red">
                     <button (click)="onDelCss(project)">del</button>
                 </div>
             </div>
 
-            <div class="mybtn center w50" *ngIf="!project.cssName">
+            <div class="htt-mybtn center w50" *ngIf="!project.cssName">
                 <button (click)="onAddCss(project)">add</button>
             </div>
 
             <p>{{project.originLanguage}}</p>
             <p>{{project.modified.split(' ').shift()}}</p>
             <p>{{project.modified.split(' ').pop()}}</p>
-            <div class="mybtn center">
+            <div class="htt-mybtn center">
                 <button (click)="onSetProject(project)">SELECT</button>
             </div>
-            <div class="mybtn center red">
+            <div class="htt-mybtn center red">
                 <button (click)="onDelete(project)">delete</button>
+            </div>
+            <div class="htt-mybtn center green">
+                <button (click)="onGenerate(project)">{{generateButtonInner}}</button>
             </div>
         </div>
 
     </div>
 
 
-    <div *ngIf="(userProjectsObs | async)?.length === 0 && !inputOpen" class="no-projects">
+    <div *ngIf="(userProjectsObs | async)?.length === 0 && !inputOpen" class="htt-no-projects">
         To start first project press ADD NEW PROJECT and select your html template file.
     </div>
 
     
-    <div *ngIf="inputOpen" class="add-project-container">
+    <div *ngIf="inputOpen" class="htt-add-project-container">
 
-        <div class="add-project">
+        <div class="htt-add-project">
             <div>
                 <label>file name:</label>
-                <p class="myinput" disabled>{{filenameAdding || "Choose file ..."}}</p>
+                <p class="htt-myinput" disabled>{{filenameAdding || "Choose file ..."}}</p>
             </div>
             
             <div>
                 <label>css file (optional):</label>
-                <div class="file-input-container">
-                    <p class="myinput">{{cssFilenameAdding || "Choose file ..."}}</p>
-                    <input type="file" class="myinput" (change)="onCssFileSelected($event)" >
+                <div class="htt-file-input-container">
+                    <p class="htt-myinput">{{cssFilenameAdding || "Choose file ..."}}</p>
+                    <input type="file" class="htt-myinput" (change)="onCssFileSelected($event)" >
                 </div>
             </div>
             <div>
                 <label>project name:</label>
-                <input type="text" placeholder="set project name..." [(ngModel)]="input">
+                <input class="htt-myinput" type="text" placeholder="set project name..." [(ngModel)]="input">
             </div>
             <div>
                 <label>origin language:</label>
-                <select #languageRef>
+                <select #languageRef class="htt-myinput">
                     <option disabled>Select Language</option>
                     <option *ngFor="let l of languages" value="{{l}}">{{l}}</option>
                 </select>
@@ -87,27 +90,27 @@
 
     </div>
     
-    <div class="mybtn center" *ngIf="inputOpen">
+    <div class="htt-mybtn center" *ngIf="inputOpen">
         <button (click)="onAddNewProject()" [disabled]="!input">ADD PROJECT</button>
     </div>
 
-    <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+    <input type="file" class="htt-file-input" (change)="onFileSelected($event)" #fileUpload>
 
 
-    <div class="buttons">
+    <div class="htt-buttons">
         
-        <div class="mybtn center">
+        <div class="htt-mybtn center">
             <button 
             (click)="inputOpen ? rejectAddingProject() : fileUpload.click()" 
             [innerHTML]="inputOpen ? 'REJECT' : 'ADD NEW PROJECT'"
             ></button>
         </div>
     
-        <div class="mybtn center">
+        <div class="htt-mybtn center">
             <button (click)="logout()">LOGOUT</button>
         </div>
     
-        <div class="mybtn center red">
+        <div class="htt-mybtn center red">
             <button (click)="deleteAccount()">delete account</button>
         </div>
 

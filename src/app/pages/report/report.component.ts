@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslationElement } from 'src/app/models/translationElement';
 import { DialogService } from 'src/app/services/dialog.service';
@@ -6,7 +6,6 @@ import { LanguagesService } from 'src/app/services/languages.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ReportService } from 'src/app/services/report.service';
 import { TemplateService } from 'src/app/services/template.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DataService } from 'src/app/services/data.service';
 
 @Component({
@@ -14,7 +13,7 @@ import { DataService } from 'src/app/services/data.service';
   templateUrl: './report.component.html',
   styleUrls: ['./report.component.css']
 })
-export class ReportComponent implements OnInit, OnDestroy {
+export class ReportComponent implements OnDestroy {
 
   purpose: string
   elements: TranslationElement[]
@@ -37,17 +36,12 @@ export class ReportComponent implements OnInit, OnDestroy {
     
     this.originLanguage = this.language.origin
     this.translateTo = this.language.translateTo
-    // this.originLanguage = 'polish'
-    // this.translateTo = 'english'
     
     this.elements = this.service.elements.map(el => {
       el[this.translateTo] = el[this.originLanguage].map(e => '')
       return el
     })
   }
-
-
-  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.service.purpose = ''

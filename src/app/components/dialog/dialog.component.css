@@ -11,7 +11,7 @@
     justify-content: center;
 }
 
-.dialog {
+.htt-dialog {
     z-index: 110;
     padding-left: 20px;
     padding-right: 20px;
@@ -24,25 +24,25 @@
     border-radius: 4px;
 }
 
-h1 {
+h1.htt {
     margin-bottom: 20px;
     max-width: 300px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.mybtn {
+.htt-mybtn {
     margin-top: 20px;
 }
 
 
 
 
-:host.open {
+:host.htt-open {
     animation: open-animation .12s ease-in-out forwards;
 }
 
-:host.open.close {
+:host.htt-open.htt-close {
     animation: close-animation .12s ease-in-out forwards;
 }
 

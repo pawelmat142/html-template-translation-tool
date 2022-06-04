@@ -1,9 +1,7 @@
 import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
 import { Dialog } from 'src/app/models/dialog';
-import { Collection } from 'src/app/models/collection';
 import { DialogService } from 'src/app/services/dialog.service';
 import { LanguagesService } from 'src/app/services/languages.service';
-import { Observable } from 'rxjs';
 
 // MODAL WINDOW
 
@@ -56,8 +54,8 @@ export class DialogComponent implements OnDestroy {
   }
 
   close(): void { 
-    if (this.classes === 'open') {
-      this.classes += ' close'
+    if (this.classes === 'htt-open') {
+      this.classes += ' htt-close'
       this.service.active = false
       setTimeout(() => this.classes = '', 200)
     }
@@ -65,7 +63,7 @@ export class DialogComponent implements OnDestroy {
   
   open(): void {
     if (this.classes === '') { 
-      this.classes = 'open'
+      this.classes = 'htt-open'
     }
   }
 
@@ -76,7 +74,6 @@ export class DialogComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.service.active = false
-    console.log('destroy')
   }
 
   // KEYBOARD

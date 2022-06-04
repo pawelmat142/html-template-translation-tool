@@ -8,6 +8,8 @@ import { DialogService } from './dialog.service';
 import { FileService } from './file.service';
 import { AuthenticationService } from './authentication.service';
 
+// MANAGES PROJECT
+
 @Injectable({
   providedIn: 'root'
 })

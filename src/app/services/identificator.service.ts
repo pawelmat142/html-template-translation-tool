@@ -4,6 +4,8 @@ import { DataService } from './data.service';
 import { DialogService } from './dialog.service';
 import { LanguagesService } from './languages.service';
 
+// IDENTIFIES TEMPLATE ELEMENTS - adding identifier attribute 
+
 const METADATAS = [
   'description',
   'author',

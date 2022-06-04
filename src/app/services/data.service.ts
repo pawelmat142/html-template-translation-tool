@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { getStorage, ref, uploadBytes, deleteObject, getBlob } from "firebase/storage"
 import { TranslationElement } from '../models/translationElement';
 
-
 // FIRESTORE INTERFACE
 
 @Injectable({

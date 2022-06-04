@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { Dialog } from '../models/dialog';
-import { Collection } from '../models/collection';
 import { LanguagesService } from './languages.service';
-import { DataService } from './data.service';
+
+// DIALOG MODAL WINDOW MANIPULATION
 
 @Injectable({
   providedIn: 'root'
 })
 export class DialogService {
-
-  // DIALOG MODAL WINDOW MANIPULATION
 
   purpose: string = ''
   languages: string[]
