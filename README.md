@@ -7,7 +7,7 @@ This project is a tool to help translators translate HTML templates. It allows y
 The motivation for doing the project is to help a friend who is building a chain of online stores in many languages and learn to use Firebase. At the moment, the data saved in the database are not secured in any way and everyone has access to them.<br /><br />
 
 app is availabe here: <br />
-[App](http://drawit.click:8080/) <br />
+[App](http://translator.drawit.click/) <br />
 you can login with: <br />
 test@t.pl<br />
 test123<br />
