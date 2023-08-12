@@ -4,7 +4,7 @@ Project built on Angular 13 and Firebase. <br />
 It is supposed to be a tool that will help automate the process of translating HTML templates for a friend who is setting up an online store chain. <br /><br />
 
 very beta version availabe here: <br />
-[beta](http://drawit.click:8080/) <br />
+[beta](https://translator.pppmmm.pl/) <br />
 you can login with: <br />
 test@t.pl<br />
 test123<br />
